@@ -1,0 +1,1 @@
+// types/global.ts
