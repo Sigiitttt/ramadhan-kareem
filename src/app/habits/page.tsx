@@ -7,6 +7,7 @@ import { useHabits } from '@/features/habits/hooks/useHabits';
 import { dapatkanTanggalHariIni } from '@/utils/tanggal';
 import DaftarHabit from '@/features/habits/components/DaftarHabit';
 import DialogTambahHabit from '@/features/habits/components/DialogTambahHabit';
+import TampilanKalenderHabit from '@/features/habits/components/HabitCalendarView';
 
 export default function HalamanHabit() {
     const { daftarHabit, tambahHabit, hapusHabit, toggleHabit, sudahDimuat } = useHabits();
@@ -62,6 +63,7 @@ export default function HalamanHabit() {
                 tutupDialog={() => setBukaDialog(false)}
                 onSimpan={tambahHabit}
             />
+            <TampilanKalenderHabit daftarHabit={daftarHabit} />
         </div>
     );
 }

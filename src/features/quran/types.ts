@@ -1,7 +1,36 @@
-// features/quran/types.ts
+export interface PenandaQuran {
+    nomorSurat: number;
+    namaSurat: string;
+    nomorAyat: number;
+}
 
 export interface DataQuran {
-    targetKhatam: number; // Target berapa kali khatam (default: 1)
-    // Menyimpan riwayat bacaan berupa { "2026-02-20": 1.5, "2026-02-21": 2 }
+    targetKhatam: number;
     riwayatBacaan: Record<string, number>;
+    penanda: PenandaQuran | null; // <-- Tambahan Baru
+}
+
+export interface SuratSingkat {
+    nomor: number;
+    nama: string;
+    namaLatin: string;
+    jumlahAyat: number;
+    tempatTurun: string;
+    arti: string;
+    deskripsi: string;
+    audioFull: Record<string, string>;
+}
+
+export interface Ayat {
+    nomorAyat: number;
+    teksArab: string;
+    teksLatin: string;
+    teksIndonesia: string;
+    audio: Record<string, string>;
+}
+
+export interface DetailSurat extends SuratSingkat {
+    ayat: Ayat[];
+    suratSelanjutnya: SuratSingkat | false;
+    suratSebelumnya: SuratSingkat | false;
 }
