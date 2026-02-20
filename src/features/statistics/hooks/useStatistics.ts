@@ -1,5 +1,3 @@
-// features/statistics/hooks/useStatistics.ts
-// features/statistics/hooks/useStatistics.ts
 'use client';
 
 import { useHabits } from '@/features/habits/hooks/useHabits';

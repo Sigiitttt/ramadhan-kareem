@@ -53,7 +53,7 @@ export default function HalamanHabit() {
     const IkonSapaan = sapaan.ikon;
 
     return (
-        <div className="flex flex-col min-h-screen relative pb-20">
+        <div className="flex flex-col min-h-screen relative pb-0">
             
             {/* Ambient Background Glow (Dekorasi Atmosfer) */}
             <div className="fixed top-0 left-0 w-full h-64 bg-gradient-to-b from-emerald-50/50 to-transparent dark:from-emerald-950/20 pointer-events-none -z-10"></div>

@@ -32,7 +32,7 @@ export default function HalamanQuran() {
     if (!sudahDimuat) return null;
 
     return (
-        <div className="flex flex-col gap-4 pb-6">
+        <div className="flex flex-col gap-4 pb-2">
 
             <div className="flex flex-col mb-1">
                 <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Al-Quran</h2>

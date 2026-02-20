@@ -3,29 +3,32 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import {
-    ChevronRight, Target, Sun, Moon, Sunrise, Sunset,
-    MapPin, BookOpen, Compass, Activity, ArrowUpRight, Calendar
+import { 
+    ChevronRight, Target, Sun, Moon, Sunrise, Sunset, 
+    MapPin, BookOpen, Compass, Activity, ArrowUpRight, Calendar,
+    TrendingUp, Fingerprint 
 } from 'lucide-react';
 import { useGamification } from '@/features/gamification/hooks/useGamification';
 import { usePrayerTimes } from '@/features/prayer/hooks/usePrayerTimes';
 import { useHabits } from '@/features/habits/hooks/useHabits';
 import { useQuranTracker } from '@/features/quran/hooks/useQuranTracker';
 import { dapatkanTanggalHariIni } from '@/utils/tanggal';
-
 import LencanaLevel from '@/features/gamification/components/LevelBadge';
 import PrayerCountdown from '@/features/prayer/components/PrayerCountdown';
+import { useStatistics } from '@/features/statistics/hooks/useStatistics'; 
 
 export default function HalamanDashboard() {
     const { dataGamifikasi, sudahDimuat: gamifikasiDimuat } = useGamification();
-    const { sholatBerikutnya, loading: sholatLoading } = usePrayerTimes();
+    const { sholatBerikutnya, namaLokasi, loading: sholatLoading, deteksiLokasi } = usePrayerTimes();
     const { daftarHabit, sudahDimuat: habitDimuat } = useHabits();
     const { dataQuran, sudahDimuat: quranDimuat } = useQuranTracker(); // <-- Hook baru ditambahkan
 
     const [sapaan, setSapaan] = useState({ teks: 'Halo', pesan: 'Siap beribadah hari ini?', ikon: Sun });
     const [tanggalHijriah, setTanggalHijriah] = useState('');
+    const { dataStatistik, sudahDimuat: statistikDimuat } = useStatistics(); 
 
-    const sudahDimuat = gamifikasiDimuat && habitDimuat && quranDimuat && !sholatLoading;
+    const sudahDimuat = gamifikasiDimuat && habitDimuat && quranDimuat && statistikDimuat && !sholatLoading;
+
     const tanggalHariIni = dapatkanTanggalHariIni();
 
     // Format tanggal Masehi
@@ -88,7 +91,7 @@ export default function HalamanDashboard() {
         : '/quran';
 
     return (
-        <div className="flex flex-col min-h-screen bg-gray-50/50 dark:bg-zinc-950 pb-28">
+        <div className="flex flex-col min-h-screen bg-gray-50/50 dark:bg-zinc-950 pb-">
 
             {/* 1. HEADER HERO (Dual Calendar & Smart Greeting) */}
             <div className="px-5 pt-8 pb-8 bg-white dark:bg-zinc-900 rounded-b-[2.5rem] shadow-[0_4px_20px_rgba(0,0,0,0.02)] border-b border-gray-100 dark:border-zinc-800 relative overflow-hidden">
@@ -99,10 +102,14 @@ export default function HalamanDashboard() {
 
                         {/* Info Lokasi & Tanggal Ganda */}
                         <div className="flex flex-wrap items-center gap-2 mb-3">
-                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-50 dark:bg-zinc-800/80 border border-gray-100 dark:border-zinc-700 text-[11px] font-bold text-gray-600 dark:text-gray-300">
-                                <MapPin size={12} className="text-emerald-500" />
-                                <span>Surabaya, ID</span>
-                            </div>
+                            <button
+                                onClick={deteksiLokasi}
+                                title="Deteksi lokasi saat ini"
+                                className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-50 hover:bg-emerald-50 dark:bg-zinc-800/80 dark:hover:bg-emerald-900/30 border border-gray-100 dark:border-zinc-700 hover:border-emerald-200 dark:hover:border-emerald-800/50 transition-all text-[11px] font-bold text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 cursor-pointer active:scale-95"
+                            >
+                                <MapPin size={12} className="text-emerald-500 group-hover:animate-bounce" />
+                                <span className="truncate max-w-[120px]">{namaLokasi}</span>
+                            </button>
                             {tanggalHijriah && (
                                 <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/30 text-[11px] font-bold text-emerald-700 dark:text-emerald-400">
                                     <Calendar size={12} />
@@ -141,6 +148,15 @@ export default function HalamanDashboard() {
                             </span>
                         </div>
                     </Link>
+                    <Link href="/tasbih" className="snap-start shrink-0 flex flex-col justify-between bg-white dark:bg-zinc-900 p-4 rounded-3xl shadow-sm border border-gray-100 dark:border-zinc-800 hover:border-purple-300 dark:hover:border-purple-700 hover:shadow-md transition-all w-[140px] group">
+                        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900/60 dark:to-purple-800/60 text-purple-600 dark:text-purple-400 flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-transform mb-3">
+                            <Fingerprint size={20} strokeWidth={2.5} />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="font-bold text-[13.5px] text-gray-800 dark:text-gray-100 leading-tight">Tasbih</span>
+                            <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 mt-0.5">Dzikir Digital</span>
+                        </div>
+                    </Link>
 
                     {/* WIDGET Arah Kiblat */}
                     <Link href="/prayer" className="snap-start shrink-0 flex flex-col justify-between bg-white dark:bg-zinc-900 p-4 rounded-3xl shadow-sm border border-gray-100 dark:border-zinc-800 hover:border-teal-300 dark:hover:border-teal-700 hover:shadow-md transition-all w-[140px] group">
@@ -162,8 +178,10 @@ export default function HalamanDashboard() {
                             <span className="font-bold text-[13.5px] text-gray-800 dark:text-gray-100 leading-tight">Log Habit</span>
                             <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 mt-0.5">Isi tracker harian</span>
                         </div>
-                    </Link>
+                    </Link> 
+                                      
                 </div>
+                
 
                 {/* 3. WIDGET UTAMA - Jadwal Sholat */}
                 <div className="flex flex-col gap-2.5">
@@ -219,14 +237,33 @@ export default function HalamanDashboard() {
                         </div>
                     </Link>
 
-                    {/* Level Gamifikasi */}
-                    <div className="relative bg-white dark:bg-zinc-900 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-zinc-800 flex flex-col overflow-hidden">
-                        <div className="p-2 h-full flex flex-col justify-center">
+                    <div className="relative bg-white dark:bg-zinc-900 rounded-[2.5rem] shadow-md flex flex-col overflow-hidden">
+                        <div className="p-3 h-full flex flex-col justify-center">
                             <LencanaLevel data={dataGamifikasi} />
                         </div>
                     </div>
-
                 </div>
+
+                <Link href="/statistics" className="group relative bg-white dark:bg-zinc-900 rounded-[2.5rem] p-5 md:p-6 shadow-sm border border-gray-100 dark:border-zinc-800 hover:shadow-md hover:border-blue-200 dark:hover:border-blue-800 transition-all flex items-center justify-between overflow-hidden mt-2">
+                    {/* Efek kilauan background */}
+                    <div className="absolute right-0 top-0 w-32 h-32 bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/10 transition-colors"></div>
+                    
+                    <div className="flex items-center gap-4 relative z-10">
+                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/60 dark:to-blue-800/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shadow-inner group-hover:scale-110 group-hover:-rotate-3 transition-transform">
+                            <TrendingUp size={26} strokeWidth={2} />
+                        </div>
+                        <div className="flex flex-col gap-0.5">
+                            <span className="font-bold text-[15px] text-gray-800 dark:text-gray-100">Statistik Ibadah</span>
+                            <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
+                                Konsistensi: <strong className="text-blue-600 dark:text-blue-400">{dataStatistik?.konsistensi30Hari || 0}%</strong> bulan ini
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="w-10 h-10 rounded-full bg-gray-50 dark:bg-zinc-800 flex items-center justify-center text-gray-400 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30 group-hover:text-blue-600 transition-all active:scale-95 relative z-10">
+                        <ArrowUpRight size={18} />
+                    </div>
+                </Link>
 
             </div>
 
