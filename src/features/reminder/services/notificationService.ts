@@ -25,6 +25,6 @@ export const kirimNotifikasi = (judul: string, pesan: string) => {
             icon: '/favicon.ico', // Pastikan kamu punya favicon di folder public
             badge: '/favicon.ico',
             vibrate: [200, 100, 200] // Getar di HP Android
-        });
+        } as any);
     }
 };
