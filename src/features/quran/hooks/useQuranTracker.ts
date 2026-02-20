@@ -1,3 +1,4 @@
+// features/quran/hooks/useQuranTracker.ts
 'use client';
 
 import { usePenyimpananLokal } from '@/hooks/usePenyimpananLokal';
@@ -6,7 +7,7 @@ import { DataQuran } from '../types';
 const DATA_BAWAAN: DataQuran = {
     targetKhatam: 1,
     riwayatBacaan: {},
-    penanda: null, 
+    penanda: null,
 };
 
 export function useQuranTracker() {
@@ -38,11 +39,20 @@ export function useQuranTracker() {
         });
     };
 
+    // --- LOGIKA YANG DIPERBAIKI: Bisa Simpan & Batal (Toggle) ---
     const simpanPenanda = (nomorSurat: number, namaSurat: string, nomorAyat: number) => {
-        setDataQuran((dataLama) => ({
-            ...dataLama,
-            penanda: { nomorSurat, namaSurat, nomorAyat }
-        }));
+        setDataQuran((dataLama) => {
+            // 1. Cek apakah ayat yang diklik SAMA persis dengan yang sudah ditandai di memori
+            const apakahSudahDitandai =
+                dataLama.penanda?.nomorSurat === nomorSurat &&
+                dataLama.penanda?.nomorAyat === nomorAyat;
+
+            return {
+                ...dataLama,
+                // 2. Jika sama, batalkan (jadikan null). Jika beda/baru, simpan datanya.
+                penanda: apakahSudahDitandai ? null : { nomorSurat, namaSurat, nomorAyat }
+            };
+        });
     };
 
     return {
@@ -52,7 +62,7 @@ export function useQuranTracker() {
         persentaseProgress,
         aturTargetKhatam,
         updateJuzHarian,
-        simpanPenanda, 
+        simpanPenanda,
         sudahDimuat
     };
 }
