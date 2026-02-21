@@ -1,7 +1,7 @@
 // features/prayer/components/QiblaCompass.tsx
 'use client';
 
-import { Compass, AlertCircle } from 'lucide-react';
+import { Compass, AlertCircle, Info } from 'lucide-react';
 import { useQibla } from '../hooks/useQibla';
 
 interface PropsKompas {
@@ -9,7 +9,7 @@ interface PropsKompas {
     longitude: any;
 }
 
-// FUNGSI BARU: Mengubah angka derajat menjadi Teks Arah Mata Angin (Otomatis se-Dunia)
+// Mengubah angka derajat menjadi Teks Arah Mata Angin
 const getArahMataAngin = (derajat: number) => {
     if (derajat >= 337.5 || derajat < 22.5) return 'Utara';
     if (derajat >= 22.5 && derajat < 67.5) return 'Timur Laut';
@@ -49,20 +49,29 @@ export default function KompasKiblat({ latitude, longitude }: PropsKompas) {
     }
 
     return (
-        <div className="flex flex-col items-center justify-center py-4">
+        <div className="flex flex-col items-center justify-center py-2">
+            
+            {/* Widget Edukasi Miskonsepsi */}
+            <div className="flex items-start gap-2 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-2xl mb-5 border border-blue-100 dark:border-blue-800/30 max-w-xs">
+                <Info size={16} className="text-blue-500 mt-0.5 shrink-0" />
+                <p className="text-[10.5px] text-blue-800 dark:text-blue-200 leading-relaxed font-medium">
+                    <strong>Fakta:</strong> Kiblat di Indonesia bukan murni menghadap Barat (270°), melainkan agak serong ke kanan menuju <strong>Barat Laut (±294°)</strong>.
+                </p>
+            </div>
 
-            <div className={`mb-6 px-4 py-1.5 rounded-full text-[11px] font-black tracking-widest uppercase transition-colors duration-500 ${sudahPas ? 'bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.5)]' : 'bg-gray-100 dark:bg-zinc-800 text-gray-500'}`}>
+            {/* Indikator Status */}
+            <div className={`mb-5 px-4 py-1.5 rounded-full text-[11px] font-black tracking-widest uppercase transition-colors duration-500 ${sudahPas ? 'bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.5)]' : 'bg-gray-100 dark:bg-zinc-800 text-gray-500'}`}>
                 {sudahPas ? 'Arah Kiblat Tepat' : 'Putar HP Anda'}
             </div>
 
-            {/* Area Kompas */}
+            {/* Area Kompas Piringan */}
             <div className="relative w-56 h-56 flex items-center justify-center">
-
-                {/* Segitiga Penunjuk HP (Statis di atas) */}
+                
+                {/* Segitiga Penunjuk HP Utama (Statis di atas layar) */}
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-r-[10px] border-b-[16px] border-l-transparent border-r-transparent border-b-emerald-500 z-20"></div>
 
-                {/* Piringan Kompas (Berputar berlawanan dengan heading HP) */}
-                <div
+                {/* Piringan Kompas Berputar */}
+                <div 
                     className="absolute w-52 h-52 border-4 border-gray-100 dark:border-zinc-800 rounded-full shadow-inner overflow-hidden bg-white dark:bg-zinc-950 transition-transform duration-300 ease-out z-10"
                     style={{ transform: `rotate(${heading !== null ? -heading : 0}deg)` }}
                 >
@@ -72,24 +81,32 @@ export default function KompasKiblat({ latitude, longitude }: PropsKompas) {
                     <span className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[12px] font-bold text-gray-400">S</span>
                     <span className="absolute top-1/2 left-2 -translate-y-1/2 text-[12px] font-bold text-gray-400">B</span>
 
-                    {/* Garis & Ikon Ka'bah (Posisi dikunci berdasarkan Derajat Kiblat) */}
+                    {/* Garis Bantuan: Murni Barat (270 derajat) */}
+                    <div className="absolute inset-0" style={{ transform: `rotate(270deg)` }}>
+                        <div className="absolute top-[18%] left-1/2 -translate-x-1/2 w-[1.5px] h-[32%] border-l-2 border-dashed border-gray-300 dark:border-zinc-700 opacity-60"></div>
+                    </div>
+
+                    {/* Garis & Ikon Ka'bah Aktual */}
                     <div className="absolute inset-0" style={{ transform: `rotate(${qiblaAngle}deg)` }}>
                         <div className="absolute top-[10%] left-1/2 -translate-x-1/2 w-1.5 h-[40%] bg-gradient-to-t from-transparent to-emerald-400 opacity-50 rounded-full"></div>
                         <div className="absolute -top-4 left-1/2 -translate-x-1/2 text-2xl drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]">🕋</div>
                     </div>
                 </div>
 
+                {/* Poros Tengah */}
                 <div className="w-4 h-4 bg-gray-200 dark:bg-zinc-700 rounded-full border-2 border-white dark:border-zinc-900 z-20 shadow-sm"></div>
             </div>
 
-            {/* Info Teks Arah (Sudah Dinamis) */}
-            <div className="mt-8 flex flex-col items-center gap-1">
-                <p className="text-[12px] font-bold text-gray-400 text-center">
-                    Arah Kiblat: <span className="text-emerald-500 inline-block">{Math.round(qiblaAngle)}° ({getArahMataAngin(qiblaAngle)})</span>
-                </p>
-                <p className="text-[10px] font-medium text-gray-500 uppercase tracking-widest text-center">
-                    Arah HP: {heading !== null ? `${Math.round(heading)}° (${getArahMataAngin(heading)})` : '--'}
-                </p>
+            {/* Info Teks Koordinat Bawah */}
+            <div className="mt-8 flex flex-col items-center gap-1.5 w-full">
+                <div className="flex justify-between w-full max-w-[200px] text-[11px] font-bold">
+                    <span className="text-gray-400">Kiblat Aktual:</span>
+                    <span className="text-emerald-500">{Math.round(qiblaAngle)}° ({getArahMataAngin(qiblaAngle)})</span>
+                </div>
+                <div className="flex justify-between w-full max-w-[200px] text-[10px] font-medium text-gray-500 border-t border-gray-100 dark:border-zinc-800 pt-1.5 mt-0.5">
+                    <span>Arah HP Saat Ini:</span>
+                    <span>{heading !== null ? `${Math.round(heading)}° (${getArahMataAngin(heading)})` : '--'}</span>
+                </div>
             </div>
         </div>
     );
