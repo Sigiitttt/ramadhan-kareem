@@ -1,22 +1,18 @@
 // features/prayer/services/prayerApi.ts
-import { DataSholatAPI } from '../types';
 
-export const ambilJadwalSholat = async (lat: number, lng: number, tanggal: Date): Promise<DataSholatAPI> => {
-    // Format tanggal untuk API Aladhan (DD-MM-YYYY)
-    const tgl = String(tanggal.getDate()).padStart(2, '0');
-    const bln = String(tanggal.getMonth() + 1).padStart(2, '0');
+export async function ambilJadwalSholatBerdasarkanKota(kota: string, tanggal: Date) {
+    const tgl = tanggal.getDate().toString().padStart(2, '0');
+    const bln = (tanggal.getMonth() + 1).toString().padStart(2, '0');
     const thn = tanggal.getFullYear();
-    const formatTanggal = `${tgl}-${bln}-${thn}`;
+    const dateStr = `${tgl}-${bln}-${thn}`;
 
-    // method=11 adalah standar Kemenag RI
-    const url = `https://api.aladhan.com/v1/timings/${formatTanggal}?latitude=${lat}&longitude=${lng}&method=11`;
-
-    const respon = await fetch(url);
-
-    if (!respon.ok) {
-        throw new Error('Gagal mengambil data jadwal sholat');
+    const url = `https://api.aladhan.com/v1/timingsByAddress/${dateStr}?address=${kota},Indonesia&method=20`;
+    
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error('Gagal mengambil data dari Aladhan API');
     }
-
-    const data = await respon.json();
-    return data.data;
-};
+    
+    const res = await response.json();
+    return res.data;
+}

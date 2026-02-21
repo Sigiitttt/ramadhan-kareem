@@ -16,7 +16,6 @@ export default function DialogTambahHabit({ buka, tutupDialog, onSimpan }: Props
     // Efek untuk reset state saat dialog ditutup
     useEffect(() => {
         if (!buka) {
-            // Kasih sedikit delay biar efek fade out modal selesai dulu baru reset
             const timer = setTimeout(() => {
                 setNamaBaru("");
                 setKategoriTerpilih("custom");

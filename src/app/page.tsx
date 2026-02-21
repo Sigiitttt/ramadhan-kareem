@@ -1,85 +1,135 @@
 // app/page.tsx
 import Link from 'next/link';
-import { Moon, BookOpen, Compass, ArrowRight, Sparkles, Star } from 'lucide-react';
+import { Target, BookOpen, Compass, Fingerprint, BarChart2, Settings, ArrowRight, Moon, Star } from 'lucide-react';
 
 export default function HalamanOnboarding() {
-  const fiturUnggulan = [
-    { ikon: Moon, judul: 'Habit Tracker', desc: 'Bangun kebiasaan baik harianmu' },
-    { ikon: BookOpen, judul: 'Target Quran', desc: 'Pantau khatam 30 Juz dengan mudah' },
-    { ikon: Compass, judul: 'Jadwal & Kiblat', desc: 'Pengingat sholat & arah presisi' },
-  ];
+    const daftarFitur = [
+        { ikon: Target, judul: 'Habit' },
+        { ikon: BookOpen, judul: 'Al Quran' },
+        { ikon: Compass, judul: 'Kiblat' },
+        { ikon: Fingerprint, judul: 'Tasbih' },
+        { ikon: BarChart2, judul: 'Statistik' },
+        { ikon: Settings, judul: 'Setelan' },
+    ];
 
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen text-center px-4 relative overflow-hidden bg-gray-50 dark:bg-zinc-950">
+    return (
+        // KUNCI 1: Gunakan h-[100dvh] dan overflow-hidden agar layar terkunci & tidak bisa di-scroll
+        <div className="flex flex-col h-[100dvh] w-full bg-gradient-to-b from-[#0bc287] to-[#09ab76] dark:from-[#088c61] dark:to-[#056042] font-sans selection:bg-white/30 relative overflow-hidden">
 
-      {/* 1. Background Grid Pattern (Tampilan Modern) */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+            {/* --- 1. AMBIENT BACKGROUND --- */}
+            <div 
+                className="absolute inset-0 opacity-[0.05] dark:opacity-[0.03] pointer-events-none mix-blend-overlay"
+                style={{ 
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M40 80c22.091 0 40-17.909 40-40S62.091 0 40 0 0 17.909 0 40s17.909 40 40 40zm0-2c20.987 0 38-17.013 38-38S60.987 2 40 2 2 19.013 2 40s17.013 38 38 38zm0-76c20.987 0 38 17.013 38 38S60.987 78 40 78 2 60.987 2 40 19.013 2 40 2zm0 2c19.882 0 36 16.118 36 36S59.882 76 40 76 4 59.882 4 40 20.118 4 40 4zm0 2c18.778 0 34 15.222 34 34S58.778 74 40 74 6 58.778 6 40 21.222 6 40 6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+                    backgroundSize: '120px 120px' 
+                }}
+            ></div>
+            
+            <Star size={12} fill="currentColor" className="absolute top-[10%] left-[15%] text-yellow-200/60 animate-[pulse_3s_ease-in-out_infinite]" />
+            <Star size={16} fill="currentColor" className="absolute top-[22%] right-[12%] text-white/40 animate-[pulse_4s_ease-in-out_infinite_delay-1000]" />
+            <Star size={8} fill="currentColor" className="absolute top-[35%] left-[8%] text-yellow-100/50 animate-[pulse_2s_ease-in-out_infinite_delay-2000]" />
 
-      {/* 2. Abstract Blurred Blobs di Latar */}
-      <div className="absolute -top-10 -left-10 w-64 h-64 bg-emerald-400/20 dark:bg-emerald-600/10 rounded-full blur-[60px] pointer-events-none"></div>
-      <div className="absolute bottom-10 -right-10 w-64 h-64 bg-teal-400/20 dark:bg-teal-600/10 rounded-full blur-[60px] pointer-events-none"></div>
+            <div className="absolute top-[25%] left-1/2 -translate-x-1/2 w-[80vw] h-[40vh] bg-white/10 dark:bg-emerald-400/10 blur-[80px] rounded-full pointer-events-none"></div>
 
-      {/* Bintang Kecil Animasi */}
-      <Star className="absolute top-32 right-12 text-yellow-400/60 animate-pulse" size={16} />
-      <Star className="absolute top-60 left-10 text-emerald-400/40 animate-pulse delay-700" size={12} />
+            {/* --- 2. HEADER TEXT --- */}
+            {/* KUNCI 2: my-auto akan membuat teks ini otomatis berada di tengah sisa ruang kosong */}
+            <div className="flex flex-col items-center justify-center my-auto relative z-10 w-full max-w-md mx-auto px-4">
+                
+                <div className="mb-4 flex items-center justify-center bg-white/15 dark:bg-white/10 p-3 rounded-full backdrop-blur-md border border-white/20 shadow-sm animate-in fade-in zoom-in duration-1000">
+                    <Moon size={28} strokeWidth={1.5} className="text-yellow-100 drop-shadow-sm" />
+                </div>
 
-      {/* 3. Logo Utama dengan Animasi Floating */}
-      <div className="relative mb-8 mt-10 animate-[bounce_4s_ease-in-out_infinite]">
-        <div className="relative z-10 w-32 h-32 bg-gradient-to-tr from-emerald-500 to-teal-400 rounded-[2.5rem] flex items-center justify-center shadow-2xl shadow-emerald-500/40 transform rotate-12 hover:rotate-0 transition-transform duration-700">
-          <Moon size={64} className="text-white transform -rotate-12" strokeWidth={1.5} />
-        </div>
-        <Sparkles className="absolute -top-4 -right-4 text-yellow-400 animate-pulse" size={36} />
-        {/* Shadow di bawah logo */}
-        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-20 h-4 bg-emerald-900/20 dark:bg-black/40 blur-md rounded-full"></div>
-      </div>
-
-      {/* 4. Teks Sambutan (Gradient Text) */}
-      <h1 className="text-4xl font-black mb-3 tracking-tight bg-gradient-to-r from-emerald-600 to-teal-400 dark:from-emerald-400 dark:to-teal-200 bg-clip-text text-transparent relative z-10">
-        Ahlan wa Sahlan
-      </h1>
-      <p className="text-gray-500 dark:text-gray-400 mb-12 max-w-[280px] text-sm relative z-10">
-        Tingkatkan kualitas ibadah dan pantau progress Ramadhan-mu dalam satu genggaman.
-      </p>
-
-      {/* 5. Daftar Kartu Fitur dengan "Shape Abu-abu" di Dalamnya */}
-      <div className="flex flex-col gap-4 w-full max-w-sm mb-14 relative z-10">
-        {fiturUnggulan.map((fitur, idx) => {
-          const Ikon = fitur.ikon;
-          return (
-            <div
-              key={idx}
-              className="group relative overflow-hidden flex items-center gap-4 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl p-4 rounded-3xl border border-white/60 dark:border-zinc-800/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all duration-500 hover:-translate-y-1 hover:shadow-emerald-500/10"
-            >
-              {/* DECORATIVE SHAPE: Bentuk abu-abu di pojok kanan kartu */}
-              <div className="absolute -right-8 -top-8 w-32 h-32 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-zinc-800 dark:to-zinc-800/50 rounded-full opacity-60 group-hover:scale-125 transition-transform duration-700 pointer-events-none"></div>
-
-              {/* Konten Kartu */}
-              <div className="relative z-10 w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/40 dark:to-emerald-900/10 border border-emerald-100 dark:border-emerald-800/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-transform duration-300">
-                <Ikon size={24} strokeWidth={2} />
-              </div>
-              <div className="relative z-10 text-left">
-                <h3 className="font-bold text-gray-800 dark:text-gray-100 text-base mb-0.5 tracking-tight">{fitur.judul}</h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">{fitur.desc}</p>
-              </div>
+                <div className="text-center animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-150 px-2">
+                    <h1 className="text-[36px] leading-[1.1] font-black tracking-[0.15em] uppercase text-white drop-shadow-md mb-1">
+                        Ramadhan
+                    </h1>
+                    <p className="text-[20px] font-bold text-[#fef08a] dark:text-[#fde047] tracking-[0.35em] uppercase mb-3 drop-shadow-sm">
+                        Kareem
+                    </p>
+                    <p className="text-[12.5px] font-medium text-white/90 max-w-[280px] mx-auto leading-relaxed drop-shadow-sm">
+                        Sempurnakan ibadahmu, catat kebaikanmu, raih kemenangan yang hakiki.
+                    </p>
+                </div>
             </div>
-          );
-        })}
-      </div>
 
-      {/* 6. Tombol CTA Glowing */}
-      <div className="w-full max-w-sm relative z-20 pb-10">
-        <Link
-          href="/dashboard"
-          className="group relative w-full flex items-center justify-center gap-3 bg-gray-900 dark:bg-emerald-500 text-white font-bold text-lg py-4.5 rounded-full overflow-hidden shadow-[0_10px_40px_rgba(16,185,129,0.3)] hover:shadow-[0_10px_40px_rgba(16,185,129,0.5)] hover:-translate-y-1 transition-all active:scale-95"
-        >
-          {/* Efek kilauan cahaya (Shine sweep) menyapu tombol */}
-          <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-[shimmer_1.5s_infinite] skew-x-12"></div>
+            {/* --- 3. BOTTOM STACK (Nempel di Bawah) --- */}
+            {/* shrink-0 menjamin area ini tidak akan pernah tertekan/mengecil ukurannya */}
+            <div className="w-full flex flex-col relative z-20 shrink-0 mt-auto">
+                
+                {/* SILUET MASJID */}
+                <div className="w-full text-white dark:text-[#09090b] -mb-[1px] animate-in slide-in-from-bottom-8 duration-1000 delay-300">
+                    <svg viewBox="0 0 1000 160" className="w-full h-auto fill-current drop-shadow-[0_-10px_20px_rgba(0,0,0,0.05)] dark:drop-shadow-[0_-10px_20px_rgba(0,0,0,0.3)]" preserveAspectRatio="none">
+                        <path d="M340,160 C340,60 660,60 660,160 Z" />
+                        <path d="M150,160 C150,100 320,100 320,160 Z" />
+                        <path d="M680,160 C680,100 850,100 850,160 Z" />
+                        
+                        <rect x="80" y="40" width="16" height="120" rx="3" />
+                        <polygon points="76,40 100,40 88,10" />
+                        <circle cx="88" cy="5" r="4" />
+                        
+                        <rect x="904" y="40" width="16" height="120" rx="3" />
+                        <polygon points="900,40 924,40 912,10" />
+                        <circle cx="912" cy="5" r="4" />
+                        
+                        <rect x="496" y="20" width="8" height="40" rx="4" />
+                        <path d="M495,10 A16,16 0 1,0 520,25 A14,14 0 1,1 502,0 Z" />
+                        
+                        <g className="opacity-80 fill-[#fef08a] dark:fill-[#fbbf24] dark:opacity-60">
+                            <rect x="465" y="110" width="16" height="30" rx="8" />
+                            <rect x="519" y="110" width="16" height="30" rx="8" />
+                            <rect x="220" y="125" width="12" height="20" rx="6" opacity="0.6" />
+                            <rect x="250" y="125" width="12" height="20" rx="6" />
+                            <rect x="738" y="125" width="12" height="20" rx="6" />
+                            <rect x="768" y="125" width="12" height="20" rx="6" opacity="0.6" />
+                        </g>
+                        <rect x="0" y="155" width="1000" height="10" />
+                    </svg>
+                </div>
 
-          <span className="relative z-10">Mulai Perjalanan</span>
-          <ArrowRight size={22} className="relative z-10 group-hover:translate-x-1 transition-transform" />
-        </Link>
-      </div>
+                {/* BOTTOM SHEET MENU */}
+                {/* KUNCI 3: pb-4 (padding bottom ditipiskan) agar tombol tidak punya gap jauh di bawah */}
+                <div className="bg-white dark:bg-[#09090b] w-full pt-1 pb-4 px-6 z-30 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] pb-safe">
+                    <div className="w-full max-w-md mx-auto flex flex-col items-center">
+                        
+                        {/* Handle Laci */}
+                        <div className="w-10 h-1 bg-gray-200 dark:bg-zinc-800 rounded-full mb-4 mt-1"></div>
+                        
+                        {/* Grid Ikon Menu (Gap dikurangi agar lebih solid) */}
+                        <div className="w-full grid grid-cols-3 gap-y-5 gap-x-4 mb-5">
+                            {daftarFitur.map((fitur, idx) => {
+                                const Ikon = fitur.ikon;
+                                return (
+                                    <div 
+                                        key={idx} 
+                                        style={{ animationFillMode: 'both', animationDelay: `${500 + (idx * 100)}ms` }}
+                                        className="flex flex-col items-center gap-2 group cursor-pointer animate-in zoom-in-95 fade-in duration-500"
+                                    >
+                                        <div className="w-[64px] h-[64px] rounded-[1.3rem] bg-[#f0fdf9] dark:bg-[#0bc287]/15 flex items-center justify-center text-[#0bc287] transition-all duration-300 group-hover:scale-105 group-hover:-translate-y-1 group-hover:bg-[#0bc287] group-hover:text-white shadow-sm ring-1 ring-[#0bc287]/5 dark:ring-transparent group-hover:shadow-[0_8px_20px_rgba(11,194,135,0.25)]">
+                                            <Ikon size={24} strokeWidth={2} className="transition-transform duration-300 group-hover:scale-110" />
+                                        </div>
+                                        <span className="text-[12px] font-bold text-gray-700 dark:text-gray-200 group-hover:text-[#0bc287] dark:group-hover:text-[#0bc287] transition-colors">
+                                            {fitur.judul}
+                                        </span>
+                                    </div>
+                                );
+                            })}
+                        </div>
 
-    </div>
-  );
+                        {/* CTA BUTTON */}
+                        <Link
+                            href="/dashboard"
+                            className="group relative w-full flex items-center justify-center gap-3 py-3.5 rounded-[1.25rem] bg-[#0bc287] hover:bg-[#09ab76] dark:hover:bg-[#0ba373] text-white font-bold text-[15px] transition-all duration-300 active:scale-95 shadow-[0_5px_15px_rgba(11,194,135,0.2)] hover:shadow-[0_8px_25px_rgba(11,194,135,0.35)] overflow-hidden animate-in slide-in-from-bottom-6 fade-in duration-700 delay-[1000ms] fill-mode-both"
+                        >
+                            <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-[shimmer_1.5s_infinite] animate-[shimmer_2s_ease-out_1s] skew-x-12"></div>
+                            <span className="relative z-10 tracking-wide">Mulai Perjalanan</span>
+                            <ArrowRight size={18} strokeWidth={2.5} className="relative z-10 group-hover:translate-x-1 transition-transform duration-300" />
+                        </Link>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    );
 }

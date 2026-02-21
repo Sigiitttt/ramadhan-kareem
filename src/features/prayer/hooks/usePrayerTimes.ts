@@ -2,67 +2,58 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { DataSholatAPI, InfoSholatBerikutnya } from '../types';
-import { ambilJadwalSholat } from '../services/prayerApi';
+import { ambilJadwalSholatBerdasarkanKota } from '../services/prayerApi';
 import { cariSholatBerikutnya } from '../utils/prayerFormatter';
+import { DataSholatAPI, InfoSholatBerikutnya } from '../types';
 
 export function usePrayerTimes() {
     const [jadwal, setJadwal] = useState<DataSholatAPI | null>(null);
     const [sholatBerikutnya, setSholatBerikutnya] = useState<InfoSholatBerikutnya | null>(null);
-    const [namaLokasi, setNamaLokasi] = useState<string>('Jakarta');
+
+    const [kotaAktif, setKotaAktif] = useState('Jakarta');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Gunakan useCallback agar tidak me-render ulang terus-menerus
-    const fetchData = useCallback(async (lat: number, lng: number, fallbackNamaKota: string) => {
+    const fetchJadwal = useCallback(async (namaKota: string) => {
         try {
             setLoading(true);
+            setError(null);
+            setKotaAktif(namaKota);
 
-            // 1. Ambil Nama Kota (Reverse Geocoding)
-            try {
-                const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=id`);
-                const locData = await res.json();
-                setNamaLokasi(locData.city || locData.locality || fallbackNamaKota);
-            } catch (e) {
-                setNamaLokasi(fallbackNamaKota);
-            }
+            localStorage.setItem('kota_sholat', namaKota);
 
-            // 2. Ambil Jadwal Sholat dari API
-            const data = await ambilJadwalSholat(lat, lng, new Date());
+            const data = await ambilJadwalSholatBerdasarkanKota(namaKota, new Date());
             setJadwal(data);
             setSholatBerikutnya(cariSholatBerikutnya(data.timings));
         } catch (err) {
-            setError('Gagal memuat jadwal sholat');
+            console.error("Gagal memuat jadwal:", err);
+            setError(err instanceof Error ? err.message : "Gagal memuat jadwal");
+            // Bisa tambahkan toast error di sini jika mau
         } finally {
             setLoading(false);
         }
     }, []);
 
-    // LOAD PERTAMA KALI: Langsung pakai Jakarta tanpa minta izin GPS
+    // Load Pertama Kali (Ambil dari Local Storage)
     useEffect(() => {
-        // Koordinat Monas, Jakarta
-        fetchData(-6.1751, 106.8272, 'Jakarta');
-    }, [fetchData]);
+        const savedKota = localStorage.getItem('kota_sholat');
+        fetchJadwal(savedKota || 'Jakarta');
+    }, [fetchJadwal]);
 
-    // FUNGSI MANUAL: Dipanggil saat user klik tombol "Sesuaikan Posisi"
-    const deteksiLokasi = () => {
-        if ('geolocation' in navigator) {
-            setLoading(true);
-            navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                    fetchData(pos.coords.latitude, pos.coords.longitude, 'Lokasi Saat Ini');
-                },
-                (err) => {
-                    console.warn('Lokasi ditolak/gagal', err);
-                    alert('Gagal mendapatkan lokasi. Pastikan GPS aktif dan browser diizinkan mengakses lokasi.');
-                    setLoading(false);
-                }
-            );
-        } else {
-            alert('Browser Anda tidak mendukung fitur lokasi.');
+    // Fungsi untuk di-trigger dari UI
+    const ubahKota = (kotaBaru: string) => {
+        // Cek agar user tidak menginput kosong
+        if (kotaBaru && kotaBaru.trim() !== '') {
+            fetchJadwal(kotaBaru.trim());
         }
     };
 
-    // Export deteksiLokasi agar bisa diklik dari UI
-    return { jadwal, sholatBerikutnya, namaLokasi, loading, error, deteksiLokasi };
+    return {
+        jadwal,
+        sholatBerikutnya,
+        namaLokasi: kotaAktif,
+        ubahKota,
+        loading,
+        error
+    };
 }
