@@ -3,10 +3,10 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { 
-    ChevronRight, Target, Sun, Moon, Sunrise, Sunset, 
+import {
+    ChevronRight, Target, Sun, Moon, Sunrise, Sunset,
     MapPin, BookOpen, Compass, Activity, ArrowUpRight, Calendar,
-    TrendingUp, Fingerprint 
+    TrendingUp, Fingerprint
 } from 'lucide-react';
 import { useGamification } from '@/features/gamification/hooks/useGamification';
 import { usePrayerTimes } from '@/features/prayer/hooks/usePrayerTimes';
@@ -15,17 +15,17 @@ import { useQuranTracker } from '@/features/quran/hooks/useQuranTracker';
 import { dapatkanTanggalHariIni } from '@/utils/tanggal';
 import LencanaLevel from '@/features/gamification/components/LevelBadge';
 import PrayerCountdown from '@/features/prayer/components/PrayerCountdown';
-import { useStatistics } from '@/features/statistics/hooks/useStatistics'; 
+import { useStatistics } from '@/features/statistics/hooks/useStatistics';
 
 export default function HalamanDashboard() {
     const { dataGamifikasi, sudahDimuat: gamifikasiDimuat } = useGamification();
-    const { sholatBerikutnya, namaLokasi, loading: sholatLoading, deteksiLokasi } = usePrayerTimes();
+    const { sholatBerikutnya, namaLokasi, loading: sholatLoading } = usePrayerTimes();
     const { daftarHabit, sudahDimuat: habitDimuat } = useHabits();
     const { dataQuran, sudahDimuat: quranDimuat } = useQuranTracker(); // <-- Hook baru ditambahkan
 
     const [sapaan, setSapaan] = useState({ teks: 'Halo', pesan: 'Siap beribadah hari ini?', ikon: Sun });
     const [tanggalHijriah, setTanggalHijriah] = useState('');
-    const { dataStatistik, sudahDimuat: statistikDimuat } = useStatistics(); 
+    const { dataStatistik, sudahDimuat: statistikDimuat } = useStatistics();
 
     const sudahDimuat = gamifikasiDimuat && habitDimuat && quranDimuat && statistikDimuat && !sholatLoading;
 
@@ -102,14 +102,10 @@ export default function HalamanDashboard() {
 
                         {/* Info Lokasi & Tanggal Ganda */}
                         <div className="flex flex-wrap items-center gap-2 mb-3">
-                            <button
-                                onClick={deteksiLokasi}
-                                title="Deteksi lokasi saat ini"
-                                className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-50 hover:bg-emerald-50 dark:bg-zinc-800/80 dark:hover:bg-emerald-900/30 border border-gray-100 dark:border-zinc-700 hover:border-emerald-200 dark:hover:border-emerald-800/50 transition-all text-[11px] font-bold text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 cursor-pointer active:scale-95"
-                            >
+                            <Link href="/prayer" className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 hover:border-emerald-300 shadow-sm transition-all text-[11px] font-bold text-gray-600 dark:text-gray-300">
                                 <MapPin size={12} className="text-emerald-500 group-hover:animate-bounce" />
-                                <span className="truncate max-w-[120px]">{namaLokasi}</span>
-                            </button>
+                                <span className="truncate max-w-[120px] capitalize">{namaLokasi}</span>
+                            </Link>
                             {tanggalHijriah && (
                                 <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/30 text-[11px] font-bold text-emerald-700 dark:text-emerald-400">
                                     <Calendar size={12} />
@@ -178,10 +174,10 @@ export default function HalamanDashboard() {
                             <span className="font-bold text-[13.5px] text-gray-800 dark:text-gray-100 leading-tight">Log Habit</span>
                             <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 mt-0.5">Isi tracker harian</span>
                         </div>
-                    </Link> 
-                                      
+                    </Link>
+
                 </div>
-                
+
 
                 {/* 3. WIDGET UTAMA - Jadwal Sholat */}
                 <div className="flex flex-col gap-2.5">
@@ -247,7 +243,7 @@ export default function HalamanDashboard() {
                 <Link href="/statistics" className="group relative bg-white dark:bg-zinc-900 rounded-[2.5rem] p-5 md:p-6 shadow-sm border border-gray-100 dark:border-zinc-800 hover:shadow-md hover:border-blue-200 dark:hover:border-blue-800 transition-all flex items-center justify-between overflow-hidden mt-2">
                     {/* Efek kilauan background */}
                     <div className="absolute right-0 top-0 w-32 h-32 bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/10 transition-colors"></div>
-                    
+
                     <div className="flex items-center gap-4 relative z-10">
                         <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/60 dark:to-blue-800/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shadow-inner group-hover:scale-110 group-hover:-rotate-3 transition-transform">
                             <TrendingUp size={26} strokeWidth={2} />
