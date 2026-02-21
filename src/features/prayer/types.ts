@@ -10,14 +10,16 @@ export interface WaktuSholat {
 }
 
 export interface DataSholatAPI {
-    timings: WaktuSholat;
+    timings: WaktuSholat; // (Ini biarkan seperti aslinya)
     meta: {
         timezone: string;
+        latitude: number;  // <-- TAMBAHKAN INI
+        longitude: number; // <-- TAMBAHKAN INI
     };
 }
-
 export interface InfoSholatBerikutnya {
     nama: string;
     waktu: string;
     sisaWaktuMs: number; // Sisa waktu dalam milidetik untuk hitung mundur
 }
+
