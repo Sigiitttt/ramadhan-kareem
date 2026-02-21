@@ -86,7 +86,6 @@ export default function HalamanOnboarding() {
                     </svg>
                 </div>
 
-                {/* BOTTOM SHEET MENU */}
                 {/* Padding dirapikan agar solid dan tidak kepanjangan di HP */}
                 <div className="bg-white dark:bg-[#09090b] w-full pt-1 pb-6 md:pb-8 px-6 z-30 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] relative">
                     <div className="w-full max-w-md mx-auto flex flex-col items-center">

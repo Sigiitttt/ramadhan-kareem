@@ -5,22 +5,26 @@ import { Compass, AlertCircle } from 'lucide-react';
 import { useQibla } from '../hooks/useQibla';
 
 interface PropsKompas {
-    latitude: number;
-    longitude: number;
+    latitude: any;
+    longitude: any;
 }
 
-export default function KompasKiblat({ latitude, longitude }: PropsKompas) {
-    // Panggil logika dari custom hook
-    const {
-        heading,
-        rotasiKiblat,
-        sudahPas,
-        error,
-        perluIzinSensor,
-        mintaIzinSensor
-    } = useQibla(latitude, longitude);
+// FUNGSI BARU: Mengubah angka derajat menjadi Teks Arah Mata Angin (Otomatis se-Dunia)
+const getArahMataAngin = (derajat: number) => {
+    if (derajat >= 337.5 || derajat < 22.5) return 'Utara';
+    if (derajat >= 22.5 && derajat < 67.5) return 'Timur Laut';
+    if (derajat >= 67.5 && derajat < 112.5) return 'Timur';
+    if (derajat >= 112.5 && derajat < 157.5) return 'Tenggara';
+    if (derajat >= 157.5 && derajat < 202.5) return 'Selatan';
+    if (derajat >= 202.5 && derajat < 247.5) return 'Barat Daya';
+    if (derajat >= 247.5 && derajat < 292.5) return 'Barat';
+    if (derajat >= 292.5 && derajat < 337.5) return 'Barat Laut';
+    return '';
+};
 
-    // Tampilan jika terjadi error (Browser tidak mendukung)
+export default function KompasKiblat({ latitude, longitude }: PropsKompas) {
+    const { heading, qiblaAngle, sudahPas, error, perluIzinSensor, mintaIzinSensor } = useQibla(latitude, longitude);
+
     if (error) {
         return (
             <div className="flex flex-col items-center justify-center p-4 text-center">
@@ -30,7 +34,6 @@ export default function KompasKiblat({ latitude, longitude }: PropsKompas) {
         );
     }
 
-    // Tampilan jika butuh izin (Khusus iPhone)
     if (perluIzinSensor) {
         return (
             <div className="flex flex-col items-center justify-center py-6 text-center">
@@ -45,37 +48,49 @@ export default function KompasKiblat({ latitude, longitude }: PropsKompas) {
         );
     }
 
-    // Tampilan Utama Kompas
     return (
         <div className="flex flex-col items-center justify-center py-4">
-            
-            {/* Indikator "Pas" */}
-            <div className={`mb-4 px-4 py-1.5 rounded-full text-[11px] font-black tracking-widest uppercase transition-colors duration-500 ${sudahPas ? 'bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.5)]' : 'bg-gray-100 dark:bg-zinc-800 text-gray-500'}`}>
+
+            <div className={`mb-6 px-4 py-1.5 rounded-full text-[11px] font-black tracking-widest uppercase transition-colors duration-500 ${sudahPas ? 'bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.5)]' : 'bg-gray-100 dark:bg-zinc-800 text-gray-500'}`}>
                 {sudahPas ? 'Arah Kiblat Tepat' : 'Putar HP Anda'}
             </div>
 
-            {/* Piringan Kompas */}
-            <div className="relative w-48 h-48 border-4 border-gray-100 dark:border-zinc-800 rounded-full flex items-center justify-center shadow-inner overflow-hidden bg-gray-50 dark:bg-zinc-950">
-                
-                {/* Garis Arah Kiblat Utama */}
-                <div 
-                    className="absolute w-full h-full transition-transform duration-300 ease-out"
-                    style={{ transform: `rotate(${rotasiKiblat}deg)` }}
+            {/* Area Kompas */}
+            <div className="relative w-56 h-56 flex items-center justify-center">
+
+                {/* Segitiga Penunjuk HP (Statis di atas) */}
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-r-[10px] border-b-[16px] border-l-transparent border-r-transparent border-b-emerald-500 z-20"></div>
+
+                {/* Piringan Kompas (Berputar berlawanan dengan heading HP) */}
+                <div
+                    className="absolute w-52 h-52 border-4 border-gray-100 dark:border-zinc-800 rounded-full shadow-inner overflow-hidden bg-white dark:bg-zinc-950 transition-transform duration-300 ease-out z-10"
+                    style={{ transform: `rotate(${heading !== null ? -heading : 0}deg)` }}
                 >
-                    <div className="absolute top-2 left-1/2 -translate-x-1/2 w-2 h-20 bg-emerald-500 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.8)]"></div>
-                    <div className="absolute top-1 left-1/2 -translate-x-1/2 w-6 h-6 bg-emerald-900 rounded flex items-center justify-center text-[10px] text-emerald-300 font-bold border border-emerald-500">
-                        🕋
+                    {/* Arah Mata Angin */}
+                    <span className="absolute top-2 left-1/2 -translate-x-1/2 text-[14px] font-black text-red-500">U</span>
+                    <span className="absolute top-1/2 right-2 -translate-y-1/2 text-[12px] font-bold text-gray-400">T</span>
+                    <span className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[12px] font-bold text-gray-400">S</span>
+                    <span className="absolute top-1/2 left-2 -translate-y-1/2 text-[12px] font-bold text-gray-400">B</span>
+
+                    {/* Garis & Ikon Ka'bah (Posisi dikunci berdasarkan Derajat Kiblat) */}
+                    <div className="absolute inset-0" style={{ transform: `rotate(${qiblaAngle}deg)` }}>
+                        <div className="absolute top-[10%] left-1/2 -translate-x-1/2 w-1.5 h-[40%] bg-gradient-to-t from-transparent to-emerald-400 opacity-50 rounded-full"></div>
+                        <div className="absolute -top-4 left-1/2 -translate-x-1/2 text-2xl drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]">🕋</div>
                     </div>
                 </div>
 
-                {/* Titik Tengah Kompas */}
-                <div className="w-4 h-4 bg-gray-300 dark:bg-zinc-700 rounded-full border-2 border-white dark:border-zinc-900 z-10"></div>
+                <div className="w-4 h-4 bg-gray-200 dark:bg-zinc-700 rounded-full border-2 border-white dark:border-zinc-900 z-20 shadow-sm"></div>
             </div>
 
-            {/* Derajat Heading */}
-            <p className="mt-5 text-[12px] font-bold text-gray-400">
-                Menunjuk: {heading !== null ? Math.round(heading) + '°' : 'Mencari sensor...'}
-            </p>
+            {/* Info Teks Arah (Sudah Dinamis) */}
+            <div className="mt-8 flex flex-col items-center gap-1">
+                <p className="text-[12px] font-bold text-gray-400 text-center">
+                    Arah Kiblat: <span className="text-emerald-500 inline-block">{Math.round(qiblaAngle)}° ({getArahMataAngin(qiblaAngle)})</span>
+                </p>
+                <p className="text-[10px] font-medium text-gray-500 uppercase tracking-widest text-center">
+                    Arah HP: {heading !== null ? `${Math.round(heading)}° (${getArahMataAngin(heading)})` : '--'}
+                </p>
+            </div>
         </div>
     );
 }
