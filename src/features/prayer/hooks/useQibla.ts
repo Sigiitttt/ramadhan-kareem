@@ -13,7 +13,7 @@ export function useQibla(latitude: number, longitude: number) {
     const [error, setError] = useState<string | null>(null);
     const [perluIzinSensor, setPerluIzinSensor] = useState(false);
 
-    // Rumus Trigonometri untuk menghitung sudut Kiblat dari koordinat user
+    // Rumus Trigonometri menghitung arah Ka'bah
     const hitungSudutKiblat = useCallback((lat: number, lng: number) => {
         const toRad = (deg: number) => (deg * Math.PI) / 180;
         const toDeg = (rad: number) => (rad * 180) / Math.PI;
@@ -25,55 +25,69 @@ export function useQibla(latitude: number, longitude: number) {
 
         const y = Math.sin(lambdaK - lambda);
         const x = Math.cos(phi) * Math.tan(phiK) - Math.sin(phi) * Math.cos(lambdaK - lambda);
-        
+
         let qibla = toDeg(Math.atan2(y, x));
         return (qibla + 360) % 360;
     }, []);
 
-    // Hitung ulang sudut Kiblat jika koordinat kota berubah
     useEffect(() => {
         if (latitude && longitude) {
             setQiblaAngle(hitungSudutKiblat(latitude, longitude));
         }
     }, [latitude, longitude, hitungSudutKiblat]);
 
-    // Membaca Sensor Orientasi HP
+    // Membaca Sensor HP (Sudah diperbaiki dari bentrok sensor)
     useEffect(() => {
-        const handleOrientation = (event: DeviceOrientationEvent) => {
-            let alpha = event.alpha;
-            // Khusus iOS menggunakan webkitCompassHeading
-            if ((event as any).webkitCompassHeading) {
-                alpha = (event as any).webkitCompassHeading;
-                setHeading(alpha);
-            } else if (alpha !== null) {
-                // Konversi alpha Android ke kompas (0 = Utara)
-                setHeading(360 - alpha);
+        let pakaiSensorAbsolut = false; // Flag penanda agar tidak ditimpa sensor abal-abal
+
+        // Event handler untuk kompas sungguhan (Android Chrome modern)
+        const handleAbsolute = (event: DeviceOrientationEvent) => {
+            if (event.alpha !== null) {
+                pakaiSensorAbsolut = true;
+                setHeading(360 - event.alpha); // Konversi agar searah jarum jam (0 = Utara)
             }
         };
 
-        // Cek apakah perangkat butuh izin manual (khusus iPhone/iOS 13+)
+        // Event handler standar (iOS / Fallback Android)
+        const handleOrientation = (event: DeviceOrientationEvent) => {
+            // Prioritas 1: Sensor kompas khusus iPhone/iOS
+            if (typeof (event as any).webkitCompassHeading !== 'undefined') {
+                setHeading((event as any).webkitCompassHeading);
+                return;
+            }
+
+            // Prioritas 2: Jika HP Android sudah pakai sensor absolut, abaikan event ini! (Ini kunci perbaikannya)
+            if (pakaiSensorAbsolut) return;
+
+            // Prioritas 3: Android lama yang menyatukan sensor di event biasa
+            if (event.absolute && event.alpha !== null) {
+                setHeading(360 - event.alpha);
+            }
+        };
+
+        // Cek Izin khusus iPhone (iOS 13+)
         if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
             setPerluIzinSensor(true);
         } else {
-            // Android bisa langsung baca sensor
-            window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+            // Pasang Listener di Android (Prioritaskan Absolute)
+            window.addEventListener('deviceorientationabsolute', handleAbsolute as EventListener, true);
             window.addEventListener('deviceorientation', handleOrientation, true);
         }
 
         return () => {
-            window.removeEventListener('deviceorientationabsolute', handleOrientation, true);
+            window.removeEventListener('deviceorientationabsolute', handleAbsolute as EventListener, true);
             window.removeEventListener('deviceorientation', handleOrientation, true);
         };
     }, []);
 
-    // Fungsi untuk meminta izin sensor (Khusus iPhone)
+    // Izin khusus untuk iPhone
     const mintaIzinSensor = async () => {
         try {
             const permissionState = await (DeviceOrientationEvent as any).requestPermission();
             if (permissionState === 'granted') {
                 setPerluIzinSensor(false);
                 window.addEventListener('deviceorientation', (event) => {
-                    if ((event as any).webkitCompassHeading) {
+                    if (typeof (event as any).webkitCompassHeading !== 'undefined') {
                         setHeading((event as any).webkitCompassHeading);
                     }
                 }, true);
@@ -85,9 +99,15 @@ export function useQibla(latitude: number, longitude: number) {
         }
     };
 
-    // Kalkulasi rotasi jarum dan deteksi posisi pas
+    // Hitung berapa derajat jarum harus diputar
     const rotasiKiblat = heading !== null ? qiblaAngle - heading : 0;
-    const sudahPas = heading !== null && (Math.abs(rotasiKiblat) < 5 || Math.abs(rotasiKiblat) > 355);
+
+    // Perbaikan deteksi toleransi "Arah Kiblat Tepat" agar lebih akurat (5 derajat)
+    let selisihDerajat = heading !== null ? Math.abs(rotasiKiblat) % 360 : null;
+    if (selisihDerajat !== null && selisihDerajat > 180) {
+        selisihDerajat = 360 - selisihDerajat;
+    }
+    const sudahPas = selisihDerajat !== null && selisihDerajat <= 5;
 
     return {
         heading,
