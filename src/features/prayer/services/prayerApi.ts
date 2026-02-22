@@ -1,18 +1,21 @@
-// features/prayer/services/prayerApi.ts
+export const ambilJadwalSholatBerdasarkanKota = async (kota: string, tanggal: Date) => {
+    try {
+        const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${kota}&country=Indonesia&method=20`);
+        const dataAPI = await res.json();
 
-export async function ambilJadwalSholatBerdasarkanKota(kota: string, tanggal: Date) {
-    const tgl = tanggal.getDate().toString().padStart(2, '0');
-    const bln = (tanggal.getMonth() + 1).toString().padStart(2, '0');
-    const thn = tanggal.getFullYear();
-    const dateStr = `${tgl}-${bln}-${thn}`;
-
-    const url = `https://api.aladhan.com/v1/timingsByAddress/${dateStr}?address=${kota},Indonesia&method=20`;
-    
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error('Gagal mengambil data dari Aladhan API');
+        if (dataAPI.code === 200) {
+            return {
+                timings: dataAPI.data.timings,
+                meta: {
+                    timezone: dataAPI.data.meta.timezone,
+                    latitude: dataAPI.data.meta.latitude,
+                    longitude: dataAPI.data.meta.longitude
+                }
+            };
+        } else {
+            throw new Error('Data tidak ditemukan');
+        }
+    } catch (error) {
+        throw new Error('Gagal mengambil jadwal sholat dari server.');
     }
-    
-    const res = await response.json();
-    return res.data;
-}
+};
