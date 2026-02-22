@@ -1,11 +1,7 @@
 // features/prayer/hooks/useQibla.ts
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-
-// Koordinat Absolut Ka'bah (Makkah)
-const KAABAH_LAT = 21.422487;
-const KAABAH_LNG = 39.826206;
+import { useState, useEffect } from 'react';
 
 export function useQibla(latitude: any, longitude: any) {
     const [heading, setHeading] = useState<number | null>(null);
@@ -13,43 +9,51 @@ export function useQibla(latitude: any, longitude: any) {
     const [error, setError] = useState<string | null>(null);
     const [perluIzinSensor, setPerluIzinSensor] = useState(false);
     
-    // State tambahan untuk nge-debug koordinat yang masuk dari API
+    // State untuk UI
     const [kordinatAktif, setKordinatAktif] = useState({ lat: 0, lng: 0 });
+    const [loadingKiblat, setLoadingKiblat] = useState(true);
 
-    const hitungSudutKiblat = useCallback((latRaw: any, lngRaw: any) => {
-        // 1. Ekstrak angka murni (buang teks/string nyasar)
-        let lat = parseFloat(latRaw);
-        let lng = parseFloat(lngRaw);
+    // KUNCI PERBAIKAN: Mengambil data langsung dari API Aladhan Qibla Direction
+    useEffect(() => {
+        let lat = parseFloat(latitude);
+        let lng = parseFloat(longitude);
 
-        // 2. Safeguard: Jika API gagal/ngaco, paksa gunakan koordinat Sidoarjo/Jawa Timur
-        if (isNaN(lat) || isNaN(lng) || (lat === 0 && lng === 0)) {
+        // SATPAM ANTI-NYASAR KE AFRIKA: 
+        // Indonesia itu ada di Longitude 95 sampai 141. 
+        // Kalau Aladhan ngasih data Longitude 7.78 (Nigeria), kita tolak dan paksa ke Sidoarjo!
+        if (isNaN(lat) || isNaN(lng) || lng < 90 || lng > 150) {
+            console.warn("API Aladhan memberikan koordinat di luar Indonesia. Memaksa ke Sidoarjo.");
             lat = -7.4478; 
             lng = 112.7183;
         }
 
-        // 3. Simpan untuk ditampilkan di UI
         setKordinatAktif({ lat, lng });
 
-        // 4. Rumus Trigonometri Bola Bumi (Spherical Trigonometry) Standar Penerbangan
-        const toRad = (deg: number) => (deg * Math.PI) / 180;
-        const toDeg = (rad: number) => (rad * 180) / Math.PI;
+        const fetchKiblatAPI = async () => {
+            setLoadingKiblat(true);
+            try {
+                // Sesuai dokumentasi Aladhan: GET /qibla/{latitude}/{longitude}
+                const res = await fetch(`https://api.aladhan.com/v1/qibla/${lat}/${lng}`);
+                const response = await res.json();
+                
+                if (response.code === 200 && response.data) {
+                    // Mengambil data "direction" dari API
+                    setQiblaAngle(Math.round(response.data.direction));
+                } else {
+                    setQiblaAngle(294); // Fallback default Barat Laut
+                }
+            } catch (err) {
+                console.error("Gagal mengambil data dari API Qibla Aladhan:", err);
+                setQiblaAngle(294);
+            } finally {
+                setLoadingKiblat(false);
+            }
+        };
 
-        const y = Math.sin(toRad(KAABAH_LNG - lng));
-        const x = Math.cos(toRad(lat)) * Math.tan(toRad(KAABAH_LAT)) - Math.sin(toRad(lat)) * Math.cos(toRad(KAABAH_LNG - lng));
-        
-        let qibla = toDeg(Math.atan2(y, x));
-        
-        // 5. Normalisasi ke 0-360 derajat
-        return Math.round((qibla + 360) % 360);
-    }, []);
+        fetchKiblatAPI();
+    }, [latitude, longitude]);
 
-    useEffect(() => {
-        if (latitude !== undefined && longitude !== undefined) {
-            setQiblaAngle(hitungSudutKiblat(latitude, longitude));
-        }
-    }, [latitude, longitude, hitungSudutKiblat]);
-
-    // Listener Sensor HP
+    // Membaca Sensor Kompas HP (Tetap menggunakan sensor hardware HP)
     useEffect(() => {
         let pakaiSensorAbsolut = false;
 
@@ -108,5 +112,5 @@ export function useQibla(latitude: any, longitude: any) {
     }
     const sudahPas = selisihDerajat !== null && selisihDerajat <= 5;
 
-    return { heading, qiblaAngle, sudahPas, error, perluIzinSensor, mintaIzinSensor, kordinatAktif };
+    return { heading, qiblaAngle, sudahPas, error, perluIzinSensor, mintaIzinSensor, kordinatAktif, loadingKiblat };
 }
