@@ -3,56 +3,89 @@
 
 import { useState, useEffect } from 'react';
 
+// Koordinat Absolut Ka'bah (Makkah)
+const KAABAH_LAT = 21.422487;
+const KAABAH_LNG = 39.826206;
+
+// 1. KAMUS KOTA OFFLINE (Super Cepat, 100% Anti-Gagal)
+const KAMUS_KOTA: Record<string, { lat: number; lng: number }> = {
+    'jakarta': { lat: -6.2088, lng: 106.8456 },
+    'surabaya': { lat: -7.2504, lng: 112.7688 },
+    'bandung': { lat: -6.9175, lng: 107.6191 },
+    'yogyakarta': { lat: -7.7956, lng: 110.3695 },
+    'semarang': { lat: -6.9932, lng: 110.4203 },
+    'medan': { lat: 3.5952, lng: 98.6722 },
+    'makassar': { lat: -5.1477, lng: 119.4327 },
+    'aceh': { lat: 5.5483, lng: 95.3238 },
+    'banda aceh': { lat: 5.5483, lng: 95.3238 },
+    'mataram': { lat: -8.5833, lng: 116.1167 },
+    'pontianak': { lat: -0.0227, lng: 109.3333 },
+    'jayapura': { lat: -2.5337, lng: 140.7181 },
+    'sidoarjo': { lat: -7.4478, lng: 112.7183 },
+};
+
 export function useQibla(kota: string) {
     const [heading, setHeading] = useState<number | null>(null);
     const [qiblaAngle, setQiblaAngle] = useState<number>(294);
     const [error, setError] = useState<string | null>(null);
     const [perluIzinSensor, setPerluIzinSensor] = useState(false);
-
+    
     const [kordinatAktif, setKordinatAktif] = useState({ lat: -7.45, lng: 112.72 });
     const [loadingKiblat, setLoadingKiblat] = useState(true);
+
+    // 2. RUMUS NAVIGASI MANDIRI (Tanpa API)
+    const hitungKiblat = (lat: number, lng: number) => {
+        const toRad = (deg: number) => (deg * Math.PI) / 180;
+        const toDeg = (rad: number) => (rad * 180) / Math.PI;
+
+        const y = Math.sin(toRad(KAABAH_LNG - lng));
+        const x = Math.cos(toRad(lat)) * Math.tan(toRad(KAABAH_LAT)) - Math.sin(toRad(lat)) * Math.cos(toRad(KAABAH_LNG - lng));
+        
+        return Math.round((toDeg(Math.atan2(y, x)) + 360) % 360);
+    };
 
     useEffect(() => {
         if (!kota) return;
 
-        const fetchKiblatAPI = async () => {
+        const cariKoordinat = async () => {
             setLoadingKiblat(true);
-            try {
-                // 1. Cari Koordinat dari Kota yang Diinput
-                const resKota = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(kota)}&country=Indonesia&method=20`);
-                const dataKota = await resKota.json();
+            let lat = -7.4478; 
+            let lng = 112.7183;
 
-                let lat = -7.4478; // Default: Sidoarjo
-                let lng = 112.7183;
+            const kotaLower = kota.toLowerCase().trim();
 
-                if (dataKota.code === 200 && dataKota.data && dataKota.data.meta) {
-                    lat = parseFloat(dataKota.data.meta.latitude);
-                    lng = parseFloat(dataKota.data.meta.longitude);
+            // Skenario A: Cari di Kamus Offline (Instan)
+            if (KAMUS_KOTA[kotaLower]) {
+                lat = KAMUS_KOTA[kotaLower].lat;
+                lng = KAMUS_KOTA[kotaLower].lng;
+            } else {
+                // Skenario B: Tanya OpenStreetMap jika kota tidak ada di kamus
+                try {
+                    const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(kota)},Indonesia&format=json&limit=1`);
+                    const data = await res.json();
+                    
+                    if (data && data.length > 0) {
+                        lat = parseFloat(data[0].lat);
+                        lng = parseFloat(data[0].lon); // OSM menggunakan 'lon'
+                    }
+                } catch (err) {
+                    console.error("Gagal melacak satelit OpenStreetMap:", err);
                 }
-
-                // SATPAM: Kalau aneh-aneh (Luar Indonesia), tolak!
-                if (isNaN(lat) || isNaN(lng) || lng < 90 || lng > 150) {
-                    lat = -7.4478;
-                    lng = 112.7183;
-                }
-
-                setKordinatAktif({ lat, lng });
-
-                // 2. Tembak Qibla Direction API dari Aladhan
-                const resQibla = await fetch(`https://api.aladhan.com/v1/qibla/${lat}/${lng}`);
-                const dataQibla = await resQibla.json();
-
-                if (dataQibla.code === 200 && dataQibla.data) {
-                    setQiblaAngle(Math.round(dataQibla.data.direction));
-                }
-            } catch (err) {
-                console.error("Gagal memuat API Kiblat Aladhan:", err);
-            } finally {
-                setLoadingKiblat(false);
             }
+
+            // Satpam: Pastikan lokasinya masuk akal (Di Indonesia)
+            if (isNaN(lat) || isNaN(lng) || lng < 90 || lng > 150) {
+                lat = -7.4478;
+                lng = 112.7183;
+            }
+
+            // Simpan Koordinat & Hitung Derajat
+            setKordinatAktif({ lat, lng });
+            setQiblaAngle(hitungKiblat(lat, lng));
+            setLoadingKiblat(false);
         };
 
-        fetchKiblatAPI();
+        cariKoordinat();
     }, [kota]);
 
     // Membaca Sensor Kompas HP
