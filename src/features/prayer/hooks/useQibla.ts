@@ -5,34 +5,34 @@ import { useState, useEffect } from 'react';
 
 export function useQibla(kota: string) {
     const [heading, setHeading] = useState<number | null>(null);
-    const [qiblaAngle, setQiblaAngle] = useState<number>(0);
+    const [qiblaAngle, setQiblaAngle] = useState<number>(294);
     const [error, setError] = useState<string | null>(null);
     const [perluIzinSensor, setPerluIzinSensor] = useState(false);
-    
-    const [kordinatAktif, setKordinatAktif] = useState({ lat: 0, lng: 0 });
+
+    const [kordinatAktif, setKordinatAktif] = useState({ lat: -7.45, lng: 112.72 });
     const [loadingKiblat, setLoadingKiblat] = useState(true);
 
-    // KUNCI: Kompas Mandiri (Fetch Data Sendiri)
     useEffect(() => {
+        if (!kota) return;
+
         const fetchKiblatAPI = async () => {
             setLoadingKiblat(true);
             try {
-                // 1. Cari Koordinat dari Kota yang Diinput (Paksa negara Indonesia biar ga nyasar ke Afrika!)
-                const resKota = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${kota}&country=Indonesia&method=20`);
+                // 1. Cari Koordinat dari Kota yang Diinput
+                const resKota = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(kota)}&country=Indonesia&method=20`);
                 const dataKota = await resKota.json();
-                
-                let lat = -7.4478; // Default Sidoarjo
+
+                let lat = -7.4478; // Default: Sidoarjo
                 let lng = 112.7183;
 
-                // Ambil koordinat yang benar dari API
-                if (dataKota.code === 200 && dataKota.data.meta) {
+                if (dataKota.code === 200 && dataKota.data && dataKota.data.meta) {
                     lat = parseFloat(dataKota.data.meta.latitude);
                     lng = parseFloat(dataKota.data.meta.longitude);
                 }
 
-                // SATPAM: Kalau aneh-aneh (Longitude di bawah 90), tolak!
+                // SATPAM: Kalau aneh-aneh (Luar Indonesia), tolak!
                 if (isNaN(lat) || isNaN(lng) || lng < 90 || lng > 150) {
-                    lat = -7.4478; 
+                    lat = -7.4478;
                     lng = 112.7183;
                 }
 
@@ -41,23 +41,18 @@ export function useQibla(kota: string) {
                 // 2. Tembak Qibla Direction API dari Aladhan
                 const resQibla = await fetch(`https://api.aladhan.com/v1/qibla/${lat}/${lng}`);
                 const dataQibla = await resQibla.json();
-                
+
                 if (dataQibla.code === 200 && dataQibla.data) {
                     setQiblaAngle(Math.round(dataQibla.data.direction));
-                } else {
-                    setQiblaAngle(294); // Fallback Barat Laut
                 }
             } catch (err) {
                 console.error("Gagal memuat API Kiblat Aladhan:", err);
-                setQiblaAngle(294);
             } finally {
                 setLoadingKiblat(false);
             }
         };
 
-        if (kota) {
-            fetchKiblatAPI();
-        }
+        fetchKiblatAPI();
     }, [kota]);
 
     // Membaca Sensor Kompas HP

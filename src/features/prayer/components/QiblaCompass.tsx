@@ -5,7 +5,7 @@ import { Compass, AlertCircle, Info, Loader2 } from 'lucide-react';
 import { useQibla } from '../hooks/useQibla';
 
 interface PropsKompas {
-    kota: string; // <-- Diubah jadi string kota
+    kota: string;
 }
 
 const getArahMataAngin = (derajat: number) => {
@@ -21,7 +21,6 @@ const getArahMataAngin = (derajat: number) => {
 };
 
 export default function KompasKiblat({ kota }: PropsKompas) {
-    // Memasukkan nama kota ke dalam otak kompas
     const { heading, qiblaAngle, sudahPas, error, perluIzinSensor, mintaIzinSensor, kordinatAktif, loadingKiblat } = useQibla(kota);
 
     if (error) {
@@ -49,8 +48,7 @@ export default function KompasKiblat({ kota }: PropsKompas) {
 
     return (
         <div className="flex flex-col items-center justify-center py-2 relative">
-            
-            {/* Overlay Loading API Aladhan */}
+
             {loadingKiblat && (
                 <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm rounded-3xl">
                     <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
@@ -71,7 +69,7 @@ export default function KompasKiblat({ kota }: PropsKompas) {
             <div className="relative w-56 h-56 flex items-center justify-center">
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-r-[10px] border-b-[16px] border-l-transparent border-r-transparent border-b-emerald-500 z-20"></div>
 
-                <div 
+                <div
                     className="absolute w-52 h-52 border-4 border-gray-100 dark:border-zinc-800 rounded-full shadow-inner overflow-hidden bg-white dark:bg-zinc-950 transition-transform duration-300 ease-out z-10"
                     style={{ transform: `rotate(${heading !== null ? -heading : 0}deg)` }}
                 >
@@ -95,17 +93,17 @@ export default function KompasKiblat({ kota }: PropsKompas) {
 
             <div className="mt-8 flex flex-col items-center gap-1.5 w-full">
                 <div className="flex justify-between w-full max-w-[200px] text-[11px] font-bold">
-                    <span className="text-gray-400">Kiblat ({kota}):</span>
+                    <span className="text-gray-400">Kiblat Aktual:</span>
                     <span className="text-emerald-500">{qiblaAngle}° ({getArahMataAngin(qiblaAngle)})</span>
                 </div>
                 <div className="flex justify-between w-full max-w-[200px] text-[10px] font-medium text-gray-500 border-t border-gray-100 dark:border-zinc-800 pt-1.5 mt-0.5">
                     <span>Arah HP Saat Ini:</span>
                     <span>{heading !== null ? `${Math.round(heading)}° (${getArahMataAngin(heading)})` : '--'}</span>
                 </div>
-                
+
                 <div className="flex justify-between w-full max-w-[200px] text-[9px] font-medium text-gray-400 border-t border-gray-100 dark:border-zinc-800 pt-1.5 mt-0.5">
-                    <span>Koordinat Ditemukan:</span>
-                    <span className="text-emerald-600 dark:text-emerald-400">
+                    <span>Lat, Lng Terkoreksi:</span>
+                    <span className={kordinatAktif.lat === -7.4478 ? "text-amber-500" : "text-emerald-600 dark:text-emerald-400"}>
                         {kordinatAktif.lat.toFixed(2)}, {kordinatAktif.lng.toFixed(2)}
                     </span>
                 </div>
