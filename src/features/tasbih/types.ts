@@ -1,6 +1,17 @@
 // features/tasbih/types.ts
 
-export interface DataTasbih {
-  hitunganSaatIni: number;
-  riwayatHarian: Record<string, number>;
+export interface StateTasbih {
+    hitungan: number;
+    target: number;
+    totalHariIni: number;
+}
+
+export interface PropsTasbihCounter {
+    hitungan: number;
+    target: number;
+    onTekan: () => void;
+}
+
+export interface PropsTasbihHistory {
+    totalHariIni: number;
 }

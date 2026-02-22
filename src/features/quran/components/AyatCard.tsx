@@ -106,7 +106,7 @@ export default function KartuAyat({ ayat, isDitandai, onTandai }: PropsAyat) {
             {/* TEKS ARAB (Spasilega, Anti-Lelah) */}
             <div className="text-right pt-2 pb-7 relative z-10">
                 <p
-                    className="text-[20px] md:text-[28px] leading-[2.3] font-normal text-gray-800 dark:text-gray-100 drop-shadow-sm selection:bg-emerald-200 dark:selection:bg-emerald-900/60"
+                    className="text-[20px] md:text-[32px] leading-[2.3] font-normal text-gray-800 dark:text-gray-100 drop-shadow-sm selection:bg-emerald-200 dark:selection:bg-emerald-900/60"
                     dir="rtl"
                     style={{ fontFamily: '"LPMQ Isep Misbah", "KFGQPC Uthman Taha Naskh", "Amiri", serif' }}
                 >

@@ -1,13 +1,17 @@
 // features/tasbih/utils/tasbihLogic.ts
 
-// Helper untuk getaran (Haptic feedback) biar terasa seperti tasbih asli
-export const getarkanTasbih = () => {
-    if (typeof window !== 'undefined' && navigator.vibrate) {
-        navigator.vibrate(50); // Getar super singkat 50ms
+export const hitungPersentaseProgress = (hitungan: number, target: number): number => {
+    if (target <= 0) return 0;
+    return Math.min((hitungan / target) * 100, 100);
+};
+
+export const getarkanHP = (pola: number | number[]) => {
+    if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
+        window.navigator.vibrate(pola);
     }
 };
 
-// Hitung siklus per 33 putaran (standar dzikir Subhanallah, Alhamdulillah, Allahu Akbar)
-export const hitungProgressSiklus = (hitungan: number, target: number = 33): number => {
-    return hitungan % target;
+// Fungsi untuk mendapatkan tanggal format YYYY-MM-DD
+export const getTanggalHariIni = (): string => {
+    return new Date().toISOString().split('T')[0];
 };
