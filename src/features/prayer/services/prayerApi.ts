@@ -11,7 +11,7 @@ export const ambilJadwalSholatBerdasarkanKota = async (kota: string, tanggal: Da
                     latitude: dataAPI.data.meta.latitude,
                     longitude: dataAPI.data.meta.longitude
                 }
-            };
+            }; //74511272
         } else {
             throw new Error('Data tidak ditemukan');
         }

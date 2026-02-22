@@ -3,57 +3,64 @@
 
 import { useState, useEffect } from 'react';
 
-export function useQibla(latitude: any, longitude: any) {
+export function useQibla(kota: string) {
     const [heading, setHeading] = useState<number | null>(null);
     const [qiblaAngle, setQiblaAngle] = useState<number>(0);
     const [error, setError] = useState<string | null>(null);
     const [perluIzinSensor, setPerluIzinSensor] = useState(false);
     
-    // State untuk UI
     const [kordinatAktif, setKordinatAktif] = useState({ lat: 0, lng: 0 });
     const [loadingKiblat, setLoadingKiblat] = useState(true);
 
-    // KUNCI PERBAIKAN: Mengambil data langsung dari API Aladhan Qibla Direction
+    // KUNCI: Kompas Mandiri (Fetch Data Sendiri)
     useEffect(() => {
-        let lat = parseFloat(latitude);
-        let lng = parseFloat(longitude);
-
-        // SATPAM ANTI-NYASAR KE AFRIKA: 
-        // Indonesia itu ada di Longitude 95 sampai 141. 
-        // Kalau Aladhan ngasih data Longitude 7.78 (Nigeria), kita tolak dan paksa ke Sidoarjo!
-        if (isNaN(lat) || isNaN(lng) || lng < 90 || lng > 150) {
-            console.warn("API Aladhan memberikan koordinat di luar Indonesia. Memaksa ke Sidoarjo.");
-            lat = -7.4478; 
-            lng = 112.7183;
-        }
-
-        setKordinatAktif({ lat, lng });
-
         const fetchKiblatAPI = async () => {
             setLoadingKiblat(true);
             try {
-                // Sesuai dokumentasi Aladhan: GET /qibla/{latitude}/{longitude}
-                const res = await fetch(`https://api.aladhan.com/v1/qibla/${lat}/${lng}`);
-                const response = await res.json();
+                // 1. Cari Koordinat dari Kota yang Diinput (Paksa negara Indonesia biar ga nyasar ke Afrika!)
+                const resKota = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${kota}&country=Indonesia&method=20`);
+                const dataKota = await resKota.json();
                 
-                if (response.code === 200 && response.data) {
-                    // Mengambil data "direction" dari API
-                    setQiblaAngle(Math.round(response.data.direction));
+                let lat = -7.4478; // Default Sidoarjo
+                let lng = 112.7183;
+
+                // Ambil koordinat yang benar dari API
+                if (dataKota.code === 200 && dataKota.data.meta) {
+                    lat = parseFloat(dataKota.data.meta.latitude);
+                    lng = parseFloat(dataKota.data.meta.longitude);
+                }
+
+                // SATPAM: Kalau aneh-aneh (Longitude di bawah 90), tolak!
+                if (isNaN(lat) || isNaN(lng) || lng < 90 || lng > 150) {
+                    lat = -7.4478; 
+                    lng = 112.7183;
+                }
+
+                setKordinatAktif({ lat, lng });
+
+                // 2. Tembak Qibla Direction API dari Aladhan
+                const resQibla = await fetch(`https://api.aladhan.com/v1/qibla/${lat}/${lng}`);
+                const dataQibla = await resQibla.json();
+                
+                if (dataQibla.code === 200 && dataQibla.data) {
+                    setQiblaAngle(Math.round(dataQibla.data.direction));
                 } else {
-                    setQiblaAngle(294); // Fallback default Barat Laut
+                    setQiblaAngle(294); // Fallback Barat Laut
                 }
             } catch (err) {
-                console.error("Gagal mengambil data dari API Qibla Aladhan:", err);
+                console.error("Gagal memuat API Kiblat Aladhan:", err);
                 setQiblaAngle(294);
             } finally {
                 setLoadingKiblat(false);
             }
         };
 
-        fetchKiblatAPI();
-    }, [latitude, longitude]);
+        if (kota) {
+            fetchKiblatAPI();
+        }
+    }, [kota]);
 
-    // Membaca Sensor Kompas HP (Tetap menggunakan sensor hardware HP)
+    // Membaca Sensor Kompas HP
     useEffect(() => {
         let pakaiSensorAbsolut = false;
 

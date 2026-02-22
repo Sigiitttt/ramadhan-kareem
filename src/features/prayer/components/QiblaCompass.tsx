@@ -5,8 +5,7 @@ import { Compass, AlertCircle, Info, Loader2 } from 'lucide-react';
 import { useQibla } from '../hooks/useQibla';
 
 interface PropsKompas {
-    latitude: any;
-    longitude: any;
+    kota: string; // <-- Diubah jadi string kota
 }
 
 const getArahMataAngin = (derajat: number) => {
@@ -21,8 +20,9 @@ const getArahMataAngin = (derajat: number) => {
     return '';
 };
 
-export default function KompasKiblat({ latitude, longitude }: PropsKompas) {
-    const { heading, qiblaAngle, sudahPas, error, perluIzinSensor, mintaIzinSensor, kordinatAktif, loadingKiblat } = useQibla(latitude, longitude);
+export default function KompasKiblat({ kota }: PropsKompas) {
+    // Memasukkan nama kota ke dalam otak kompas
+    const { heading, qiblaAngle, sudahPas, error, perluIzinSensor, mintaIzinSensor, kordinatAktif, loadingKiblat } = useQibla(kota);
 
     if (error) {
         return (
@@ -95,7 +95,7 @@ export default function KompasKiblat({ latitude, longitude }: PropsKompas) {
 
             <div className="mt-8 flex flex-col items-center gap-1.5 w-full">
                 <div className="flex justify-between w-full max-w-[200px] text-[11px] font-bold">
-                    <span className="text-gray-400">Kiblat Aktual (API):</span>
+                    <span className="text-gray-400">Kiblat ({kota}):</span>
                     <span className="text-emerald-500">{qiblaAngle}° ({getArahMataAngin(qiblaAngle)})</span>
                 </div>
                 <div className="flex justify-between w-full max-w-[200px] text-[10px] font-medium text-gray-500 border-t border-gray-100 dark:border-zinc-800 pt-1.5 mt-0.5">
@@ -103,10 +103,9 @@ export default function KompasKiblat({ latitude, longitude }: PropsKompas) {
                     <span>{heading !== null ? `${Math.round(heading)}° (${getArahMataAngin(heading)})` : '--'}</span>
                 </div>
                 
-                {/* Teks Koordinat untuk verifikasi */}
                 <div className="flex justify-between w-full max-w-[200px] text-[9px] font-medium text-gray-400 border-t border-gray-100 dark:border-zinc-800 pt-1.5 mt-0.5">
-                    <span>Lat, Lng Terkoreksi:</span>
-                    <span className={kordinatAktif.lat === -7.4478 ? "text-amber-500" : ""}>
+                    <span>Koordinat Ditemukan:</span>
+                    <span className="text-emerald-600 dark:text-emerald-400">
                         {kordinatAktif.lat.toFixed(2)}, {kordinatAktif.lng.toFixed(2)}
                     </span>
                 </div>
