@@ -6,11 +6,11 @@ import { MapPin, Calendar, Compass, Search, X } from 'lucide-react';
 import { usePrayerTimes } from '@/features/prayer/hooks/usePrayerTimes';
 import PrayerCountdown from '@/features/prayer/components/PrayerCountdown';
 import PrayerCard from '@/features/prayer/components/PrayerCard';
-import {QiblaCompass} from '@/features/prayer/components/QiblaCompass';
+import KompasKiblat from '@/features/prayer/components/QiblaCompass';
 
 export default function HalamanPrayer() {
     const { jadwal, sholatBerikutnya, namaLokasi, loading, error, ubahKota } = usePrayerTimes();
-    
+
     // STATE UNTUK POP-UP CUSTOM
     const [modalBuka, setModalBuka] = useState(false);
     const [inputKota, setInputKota] = useState("");
@@ -30,7 +30,7 @@ export default function HalamanPrayer() {
         if (zona.includes('jakarta') || zona.includes('pontianak')) return 'WIB';
         if (zona.includes('makassar') || zona.includes('bali') || zona.includes('kuala_lumpur')) return 'WITA';
         if (zona.includes('jayapura')) return 'WIT';
-        return tz.replace(/_/g, ' '); 
+        return tz.replace(/_/g, ' ');
     };
 
     // SKELETON LOADING
@@ -56,11 +56,11 @@ export default function HalamanPrayer() {
                 <p className="text-sm text-gray-500 max-w-[250px] leading-relaxed">
                     Pastikan nama kota <strong>{namaLokasi}</strong> benar dan periksa koneksi internet Anda.
                 </p>
-                <button 
+                <button
                     onClick={() => {
                         setInputKota(namaLokasi);
                         setModalBuka(true);
-                    }} 
+                    }}
                     className="mt-4 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full text-sm font-bold active:scale-95 transition-all shadow-md"
                 >
                     Ubah Kota
@@ -85,7 +85,7 @@ export default function HalamanPrayer() {
 
     return (
         <div className="flex flex-col min-h-screen relative pb-28">
-            
+
             {/* --- MODAL / POP-UP GANTI KOTA --- */}
             {modalBuka && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
@@ -117,7 +117,7 @@ export default function HalamanPrayer() {
                     </div>
                 </div>
             )}
-            
+
             {/* Latar Belakang Cahaya (Ambient Glow) */}
             <div className="fixed top-0 left-0 w-full h-72 bg-gradient-to-b from-teal-50/80 to-transparent dark:from-teal-950/20 pointer-events-none -z-10"></div>
             <div className="fixed top-0 right-0 w-64 h-64 bg-emerald-400/10 rounded-full blur-[80px] pointer-events-none -z-10"></div>
@@ -136,7 +136,7 @@ export default function HalamanPrayer() {
                             <MapPin size={12} className="text-emerald-500 group-hover:animate-bounce" />
                             <span className="truncate max-w-[150px] capitalize">{namaLokasi}</span>
                         </button>
-                        
+
                         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/30 text-[11px] font-bold text-emerald-700 dark:text-emerald-400">
                             <Calendar size={12} />
                             <span>{tanggalHijriah}</span>
@@ -156,7 +156,7 @@ export default function HalamanPrayer() {
 
             {/* KONTEN UTAMA */}
             <div className="flex flex-col gap-8 z-10 px-4">
-                
+
                 {/* 1. WIDGET HITUNG MUNDUR */}
                 <div className="animate-in fade-in slide-in-from-bottom-6 duration-700 ease-out fill-mode-both">
                     <div className="rounded-[2.5rem] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-none border border-white/60 dark:border-zinc-800/60 bg-white/40 dark:bg-zinc-900/40 backdrop-blur-xl">
@@ -173,12 +173,12 @@ export default function HalamanPrayer() {
                     <div className="rounded-[2.5rem] bg-white dark:bg-zinc-900 p-6 shadow-sm border border-gray-100 dark:border-zinc-800 relative overflow-hidden group">
                         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                         <div className="relative z-10">
-                            
+
                             {/* --- KUNCI INTEGRASI KOMPAS DI SINI --- */}
-                            <QiblaCompass
-  latitude={jadwal.meta.latitude}
-  longitude={jadwal.meta.longitude}
-/>
+                            <KompasKiblat
+                                latitude={jadwal.meta.latitude}
+                                longitude={jadwal.meta.longitude}
+                            />
 
                         </div>
                     </div>
@@ -195,7 +195,7 @@ export default function HalamanPrayer() {
                             ZONA {formatZonaWaktu(jadwal.meta?.timezone)}
                         </span>
                     </div>
-                    
+
                     <div className="rounded-[2.5rem] bg-white dark:bg-zinc-900 p-2 shadow-sm border border-gray-100 dark:border-zinc-800">
                         <PrayerCard jadwal={jadwal.timings} sholatBerikutnya={sholatBerikutnya?.nama} />
                     </div>

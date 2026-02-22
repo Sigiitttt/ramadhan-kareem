@@ -12,46 +12,44 @@ export function useQibla(latitude: any, longitude: any) {
     const [qiblaAngle, setQiblaAngle] = useState<number>(0);
     const [error, setError] = useState<string | null>(null);
     const [perluIzinSensor, setPerluIzinSensor] = useState(false);
+    
+    // State tambahan untuk nge-debug koordinat yang masuk dari API
+    const [kordinatAktif, setKordinatAktif] = useState({ lat: 0, lng: 0 });
 
-    // Rumus Matematika Anti-Gagal
     const hitungSudutKiblat = useCallback((latRaw: any, lngRaw: any) => {
-        // 1. Pastikan data yang masuk adalah Angka Asli (Desimal)
+        // 1. Ekstrak angka murni (buang teks/string nyasar)
         let lat = parseFloat(latRaw);
         let lng = parseFloat(lngRaw);
 
-        // 2. Jika API gagal/ngadat, paksa gunakan Sidoarjo sebagai cadangan aman
-        if (isNaN(lat) || isNaN(lng)) {
-            lat = -7.4478;
+        // 2. Safeguard: Jika API gagal/ngaco, paksa gunakan koordinat Sidoarjo/Jawa Timur
+        if (isNaN(lat) || isNaN(lng) || (lat === 0 && lng === 0)) {
+            lat = -7.4478; 
             lng = 112.7183;
         }
 
-        // 3. Konversi ke Radian
+        // 3. Simpan untuk ditampilkan di UI
+        setKordinatAktif({ lat, lng });
+
+        // 4. Rumus Trigonometri Bola Bumi (Spherical Trigonometry) Standar Penerbangan
         const toRad = (deg: number) => (deg * Math.PI) / 180;
         const toDeg = (rad: number) => (rad * 180) / Math.PI;
 
-        const latK = toRad(KAABAH_LAT);
-        const lngK = toRad(KAABAH_LNG);
-        const latU = toRad(lat);
-        const lngU = toRad(lng);
-
-        // 4. Rumus Inti Arah Kiblat (Disederhanakan agar browser tidak error)
-        const y = Math.sin(lngK - lngU);
-        const x = Math.cos(latU) * Math.tan(latK) - Math.sin(latU) * Math.cos(lngK - lngU);
-
+        const y = Math.sin(toRad(KAABAH_LNG - lng));
+        const x = Math.cos(toRad(lat)) * Math.tan(toRad(KAABAH_LAT)) - Math.sin(toRad(lat)) * Math.cos(toRad(KAABAH_LNG - lng));
+        
         let qibla = toDeg(Math.atan2(y, x));
-
-        // 5. Pastikan derajatnya bulat antara 0 - 360
+        
+        // 5. Normalisasi ke 0-360 derajat
         return Math.round((qibla + 360) % 360);
     }, []);
 
-    // Jalankan rumus setiap kali lokasi berubah
     useEffect(() => {
         if (latitude !== undefined && longitude !== undefined) {
             setQiblaAngle(hitungSudutKiblat(latitude, longitude));
         }
     }, [latitude, longitude, hitungSudutKiblat]);
 
-    // Membaca Sensor Kompas HP
+    // Listener Sensor HP
     useEffect(() => {
         let pakaiSensorAbsolut = false;
 
@@ -104,12 +102,11 @@ export function useQibla(latitude: any, longitude: any) {
         }
     };
 
-    // Deteksi hijau "Arah Kiblat Tepat" (Toleransi 5 derajat)
     let selisihDerajat = heading !== null ? Math.abs(qiblaAngle - heading) % 360 : null;
     if (selisihDerajat !== null && selisihDerajat > 180) {
         selisihDerajat = 360 - selisihDerajat;
     }
     const sudahPas = selisihDerajat !== null && selisihDerajat <= 5;
 
-    return { heading, qiblaAngle, sudahPas, error, perluIzinSensor, mintaIzinSensor };
+    return { heading, qiblaAngle, sudahPas, error, perluIzinSensor, mintaIzinSensor, kordinatAktif };
 }
