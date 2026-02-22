@@ -6,7 +6,7 @@ import { MapPin, Calendar, Compass, Search, X } from 'lucide-react';
 import { usePrayerTimes } from '@/features/prayer/hooks/usePrayerTimes';
 import PrayerCountdown from '@/features/prayer/components/PrayerCountdown';
 import PrayerCard from '@/features/prayer/components/PrayerCard';
-import KompasKiblat from '@/features/prayer/components/QiblaCompass';
+import {QiblaCompass} from '@/features/prayer/components/QiblaCompass';
 
 export default function HalamanPrayer() {
     const { jadwal, sholatBerikutnya, namaLokasi, loading, error, ubahKota } = usePrayerTimes();
@@ -175,11 +175,11 @@ export default function HalamanPrayer() {
                         <div className="relative z-10">
                             
                             {/* --- KUNCI INTEGRASI KOMPAS DI SINI --- */}
-                            <KompasKiblat 
-                                latitude={jadwal.meta.latitude} 
-                                longitude={jadwal.meta.longitude} 
-                            />
-                            
+                            <QiblaCompass
+  latitude={jadwal.meta.latitude}
+  longitude={jadwal.meta.longitude}
+/>
+
                         </div>
                     </div>
                 </div>
