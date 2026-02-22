@@ -156,22 +156,15 @@ export default function HalamanDashboard() {
                     </Link>
 
                     {/* WIDGET Arah Kiblat */}
-                    {/* 2. WIDGET KOMPAS KIBLAT */}
-                    <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150 ease-out fill-mode-both">
-                        <div className="flex items-center gap-2 px-1">
-                            <div className="w-1.5 h-5 bg-gradient-to-b from-emerald-400 to-teal-600 rounded-full"></div>
-                            <h3 className="font-bold text-gray-800 dark:text-gray-100 text-lg tracking-tight">Arah Kiblat</h3>
+                    <Link href="/prayer" className="snap-start shrink-0 flex flex-col justify-between bg-white dark:bg-zinc-900 p-4 rounded-3xl shadow-sm border border-gray-100 dark:border-zinc-800 hover:border-teal-300 dark:hover:border-teal-700 hover:shadow-md transition-all w-[140px] group">
+                        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-teal-100 to-teal-200 dark:from-teal-900/60 dark:to-teal-800/60 text-teal-600 dark:text-teal-400 flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-transform mb-3">
+                            <Compass size={20} strokeWidth={2.5} />
                         </div>
-                        <div className="rounded-[2.5rem] bg-white dark:bg-zinc-900 p-6 shadow-sm border border-gray-100 dark:border-zinc-800 relative overflow-hidden group">
-                            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                            <div className="relative z-10">
-
-                                {/* --- KUNCI: Kompas sekarang mandiri, cuma butuh nama kota! --- */}
-                                <KompasKiblat kota={namaLokasi} />
-
-                            </div>
+                        <div className="flex flex-col">
+                            <span className="font-bold text-[13.5px] text-gray-800 dark:text-gray-100 leading-tight">Arah Kiblat</span>
+                            <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 mt-0.5">Kompas Presisi</span>
                         </div>
-                    </div>
+                    </Link>
 
                     {/* WIDGET Log Habit */}
                     <Link href="/habits" className="snap-start shrink-0 flex flex-col justify-between bg-white dark:bg-zinc-900 p-4 rounded-3xl shadow-sm border border-gray-100 dark:border-zinc-800 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md transition-all w-[140px] group">
