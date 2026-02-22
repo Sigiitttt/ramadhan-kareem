@@ -7,7 +7,7 @@ import { hitungPersentaseProgress } from '../utils/tasbihLogic';
 
 export default function TasbihCounter({ hitungan, target, onTekan }: PropsTasbihCounter) {
     const persentase = hitungPersentaseProgress(hitungan, target);
-    const radius = 135; // Lingkaran diperbesar sedikit
+    const radius = 135;
     const keliling = 2 * Math.PI * radius;
     const offset = keliling - (persentase / 100) * keliling;
 
@@ -41,7 +41,7 @@ export default function TasbihCounter({ hitungan, target, onTekan }: PropsTasbih
                         />
                     )}
                 </svg>
-
+                   
                 {/* Tombol Tap Raksasa (Dengan efek Glowing) */}
                 <button 
                     onClick={onTekan}

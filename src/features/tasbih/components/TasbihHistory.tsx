@@ -6,7 +6,6 @@ import { PropsTasbihHistory } from '../types';
 
 export default function TasbihHistory({ totalHariIni }: PropsTasbihHistory) {
     return (
-        // mb-28 (sekitar 112px) memastikan kapsul ini mengambang aman di atas Navbar
         <div className="w-full mt-auto mb-28 px-4 flex justify-center relative z-20">
             
             {/* Kapsul Melayang (Floating Pill) */}
