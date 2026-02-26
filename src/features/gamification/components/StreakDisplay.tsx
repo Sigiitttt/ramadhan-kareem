@@ -1,5 +1,4 @@
-// features/gamification/components/StreakDisplay.tsx
-// features/gamification/components/StreakDisplay.tsx
+
 import { Flame } from 'lucide-react';
 
 interface PropsStreak {
