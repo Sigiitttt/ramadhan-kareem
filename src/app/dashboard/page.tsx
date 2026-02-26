@@ -47,10 +47,10 @@ export default function HalamanDashboard() {
             let hijri = new Intl.DateTimeFormat('id-ID-u-ca-islamic', {
                 day: 'numeric', month: 'long', year: 'numeric'
             }).format(new Date());
-            
+
             // Perbaiki format aneh dari browser (AH -> H, Ramadan -> Ramadhan)
             hijri = hijri.replace(/ AH/g, ' H').replace(/AH/g, 'H').replace(/Ramadan/g, 'Ramadhan');
-            
+
             setTanggalHijriah(hijri);
         } catch (e) {
             setTanggalHijriah('');
@@ -60,7 +60,8 @@ export default function HalamanDashboard() {
     // SKELETON LOADING
     if (!sudahDimuat) {
         return (
-            <div className="flex flex-col gap-4 animate-pulse pt-6 px-4 pb-24 min-h-[100dvh]">
+            // padding X diseragamkan menjadi px-3
+            <div className="flex flex-col gap-4 animate-pulse pt-6 px-3 pb-24 min-h-[100dvh]">
                 <div className="h-24 w-full bg-gray-200 dark:bg-zinc-800 rounded-3xl mb-2"></div>
                 <div className="flex gap-3 overflow-hidden mb-2">
                     {[1, 2, 3].map(i => (
@@ -95,7 +96,7 @@ export default function HalamanDashboard() {
     const daftarMenuCepat = [
         {
             href: linkQuran, ikon: BookOpen,
-            warna: 'group-hover:text-emerald-500', 
+            warna: 'group-hover:text-emerald-500',
             bgIkon: 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400',
             borderHover: 'hover:border-emerald-300 dark:hover:border-emerald-700',
             judul: penandaQuran ? 'Lanjut Baca' : 'Mulai Ngaji',
@@ -103,21 +104,21 @@ export default function HalamanDashboard() {
         },
         {
             href: '/tasbih', ikon: Fingerprint,
-            warna: 'group-hover:text-purple-500', 
+            warna: 'group-hover:text-purple-500',
             bgIkon: 'bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400',
             borderHover: 'hover:border-purple-300 dark:hover:border-purple-700',
             judul: 'Tasbih', subJudul: 'Dzikir Digital'
         },
         {
             href: '/prayer', ikon: Compass,
-            warna: 'group-hover:text-teal-500', 
+            warna: 'group-hover:text-teal-500',
             bgIkon: 'bg-teal-100 dark:bg-teal-900/40 text-teal-600 dark:text-teal-400',
             borderHover: 'hover:border-teal-300 dark:hover:border-teal-700',
             judul: 'Arah Kiblat', subJudul: 'Kompas Presisi'
         },
         {
             href: '/habits', ikon: Activity,
-            warna: 'group-hover:text-blue-500', 
+            warna: 'group-hover:text-blue-500',
             bgIkon: 'bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400',
             borderHover: 'hover:border-blue-300 dark:hover:border-blue-700',
             judul: 'Log Habit', subJudul: 'Isi Rutinitas'
@@ -128,8 +129,8 @@ export default function HalamanDashboard() {
         <div className="flex flex-col min-h-[100dvh] bg-gray-50 dark:bg-[#09090b] pb-24 overscroll-none selection:bg-emerald-500/30">
 
             {/* 1. HEADER HERO */}
-            {/* Mengurangi padding X menjadi px-4 dan sedikit mengurangi padding Y */}
-            <div className="px-4 pt-6 pb-6 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl rounded-b-3xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] border-b border-gray-100 dark:border-zinc-800 relative overflow-hidden shrink-0 animate-in fade-in slide-in-from-top-4 duration-700">
+            {/* Mengubah px-4 menjadi px-3 agar sejajar sempurna */}
+            <div className="px-3 pt-6 pb-6 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl rounded-b-3xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] border-b border-gray-100 dark:border-zinc-800 relative overflow-hidden shrink-0 animate-in fade-in slide-in-from-top-4 duration-700">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-400/15 dark:bg-emerald-500/10 rounded-full blur-[80px] pointer-events-none -translate-y-1/2 translate-x-1/4"></div>
 
                 <div className="flex justify-between items-start relative z-10">
@@ -159,11 +160,12 @@ export default function HalamanDashboard() {
             </div>
 
             {/* MAIN CONTENT WRAPPER */}
-            {/* Menggunakan gap-5 agar tidak terlalu renggang, padding selaras px-4 */}
-            <div className="flex flex-col gap-5 px-4 pt-5 z-10 flex-1 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150 fill-mode-both">
+            {/* px-4 diubah ke px-3, gap-5 diubah ke gap-4 */}
+            <div className="flex flex-col gap-4 px-3 pt-5 z-10 flex-1 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150 fill-mode-both">
 
                 {/* 2. MENU AKSES CEPAT */}
-                <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 snap-x snap-mandatory hide-scrollbar scroll-smooth">
+                {/* Margin negatif dan padding juga disesuaikan ke angka 3 (-mx-3 px-3) */}
+                <div className="flex gap-3 overflow-x-auto pb-2 -mx-3 px-3 snap-x snap-mandatory hide-scrollbar scroll-smooth">
                     {daftarMenuCepat.map((menu, idx) => {
                         const Ikon = menu.ikon;
                         return (
@@ -192,7 +194,6 @@ export default function HalamanDashboard() {
                         </h3>
                         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{tanggalMasehi}</span>
                     </div>
-                    {/* Mengurangi radius border menjadi 3xl agar tidak memakan ruang visual terlalu tinggi */}
                     <div className="rounded-3xl overflow-hidden shadow-sm border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900">
                         <PrayerCountdown berikutnya={sholatBerikutnya} />
                     </div>
@@ -239,15 +240,13 @@ export default function HalamanDashboard() {
                         </div>
                     </Link>
 
-                    {/* Level Badge Box - Diperbaiki */}
-                    {/* Dihilangkan box putih/glass agar desain card hijau bawaan langsung menempel dengan rapi */}
+                    {/* Level Badge Box */}
                     <div className="relative flex flex-col min-h-[180px]">
                         <LencanaLevel data={dataGamifikasi} />
                     </div>
                 </div>
 
                 {/* 5. STATISTIK BANNER WIDGET */}
-                {/* Border radius diperhalus menjadi rounded-3xl */}
                 <Link href="/statistics" className="group relative bg-white dark:bg-zinc-900 rounded-3xl p-4 shadow-sm border border-gray-100 dark:border-zinc-800 hover:shadow-md hover:border-blue-200 dark:hover:border-blue-800 transition-all duration-300 flex items-center justify-between overflow-hidden active:scale-[0.98]">
                     <div className="absolute right-0 top-0 w-32 h-32 bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/15 transition-colors"></div>
 

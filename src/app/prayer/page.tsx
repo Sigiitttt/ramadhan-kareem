@@ -33,7 +33,8 @@ export default function HalamanPrayer() {
 
     if (loading) {
         return (
-            <div className="flex flex-col gap-5 animate-pulse pt-6 px-4 pb-24">
+            // px-4 diubah ke px-3
+            <div className="flex flex-col gap-4 animate-pulse pt-6 px-3 pb-24">
                 <div className="h-8 w-48 bg-gray-200 dark:bg-zinc-800 rounded-lg mb-2"></div>
                 <div className="h-[130px] bg-gray-200 dark:bg-zinc-800 rounded-3xl"></div>
                 <div className="h-[320px] bg-gray-200 dark:bg-zinc-800 rounded-3xl"></div>
@@ -44,8 +45,9 @@ export default function HalamanPrayer() {
 
     if (error || !jadwal) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[70vh] gap-4 text-center px-4">
-                <div className="w-16 h-16 bg-red-50 dark:bg-red-900/20 text-red-500 rounded-3xl flex items-center justify-center mb-2 shadow-sm border border-red-100 dark:border-red-900/50">
+            // px-4 diubah ke px-3
+            <div className="flex flex-col items-center justify-center min-h-[70vh] gap-3 text-center px-3">
+                <div className="w-16 h-16 bg-red-50 dark:bg-red-900/20 text-red-500 rounded-3xl flex items-center justify-center mb-1 shadow-sm border border-red-100 dark:border-red-900/50">
                     <Compass size={32} strokeWidth={1.5} />
                 </div>
                 <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">Gagal Memuat Jadwal</h3>
@@ -84,6 +86,7 @@ export default function HalamanPrayer() {
             {/* MODAL UBAH KOTA */}
             {modalBuka && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center px-3 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    {/* Padding modal dikurangi dari p-5 ke p-4 agar tidak memakan ruang */}
                     <div className="bg-white dark:bg-zinc-900 rounded-[2rem] p-4 w-full max-w-sm shadow-xl dark:shadow-[0_20px_60px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-zinc-800 animate-in zoom-in-95 duration-200">
                         <div className="flex justify-between items-center mb-4 px-1">
                             <h3 className="text-[17px] font-black text-gray-900 dark:text-white tracking-tight">Pilih Kota</h3>
@@ -118,8 +121,9 @@ export default function HalamanPrayer() {
             <div className="fixed top-0 right-0 w-64 h-64 bg-emerald-400/10 rounded-full blur-[80px] pointer-events-none -z-10"></div>
 
             {/* HEADER STICKY */}
-            <div className="sticky top-0 z-40 px-4 pt-6 pb-5 bg-white/70 dark:bg-zinc-950/70 backdrop-blur-2xl border-b border-gray-100 dark:border-zinc-800/50 mb-5 animate-in fade-in slide-in-from-top-4 duration-700">
-                <div className="flex flex-col gap-3">
+            {/* Mengubah px-4 menjadi px-3 */}
+            <div className="sticky top-0 z-40 px-3 pt-6 pb-4 bg-white/70 dark:bg-zinc-950/70 backdrop-blur-2xl border-b border-gray-100 dark:border-zinc-800/50 mb-4 animate-in fade-in slide-in-from-top-4 duration-700">
+                <div className="flex flex-col gap-2.5">
                     <div className="flex flex-wrap items-center gap-2">
                         <button
                             onClick={() => {
@@ -150,35 +154,33 @@ export default function HalamanPrayer() {
             </div>
 
             {/* MAIN CONTENT */}
-            {/* Gap disesuaikan menjadi gap-5 agar tidak terlalu berjarak */}
-            <div className="flex flex-col gap-5 z-10 px-4">
+            {/* px-4 diubah ke px-3, gap-5 diubah ke gap-4 biar lebih rapat dan lebar di HP */}
+            <div className="flex flex-col gap-4 z-10 px-3">
 
                 {/* 1. COUNTDOWN WIDGET */}
                 <div className="animate-in fade-in slide-in-from-bottom-6 duration-700 ease-out fill-mode-both">
-                    {/* Menggunakan rounded-3xl */}
                     <div className="rounded-3xl overflow-hidden shadow-sm dark:shadow-none border border-white/60 dark:border-zinc-800/60 bg-white/40 dark:bg-zinc-900/40 backdrop-blur-xl">
                         <PrayerCountdown berikutnya={sholatBerikutnya} />
                     </div>
                 </div>
 
                 {/* 2. KIBLAT WIDGET */}
-                <div className="flex flex-col gap-2.5 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150 ease-out fill-mode-both">
+                <div className="flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150 ease-out fill-mode-both">
                     <div className="flex items-center gap-2 px-1">
                         <div className="w-1.5 h-4 bg-gradient-to-b from-emerald-400 to-teal-600 rounded-full"></div>
                         <h3 className="font-bold text-gray-800 dark:text-gray-100 text-[15px] tracking-tight">Arah Kiblat</h3>
                     </div>
-                    {/* Menggunakan rounded-3xl dan padding dikurangi (p-5) */}
-                    <div className="rounded-3xl bg-white dark:bg-zinc-900 p-5 shadow-sm border border-gray-100 dark:border-zinc-800 relative overflow-hidden group">
+                    {/* Mengurangi padding di dalam card kompas dari p-5 ke p-4 */}
+                    <div className="rounded-3xl bg-white dark:bg-zinc-900 p-4 shadow-sm border border-gray-100 dark:border-zinc-800 relative overflow-hidden group">
                         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                         <div className="relative z-10">
-                            {/* Komponen Kompas Kiblat */}
                             <KompasKiblat kota={namaLokasi} />
                         </div>
                     </div>
                 </div>
 
                 {/* 3. JADWAL LENGKAP WIDGET */}
-                <div className="flex flex-col gap-2.5 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-300 ease-out fill-mode-both">
+                <div className="flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-300 ease-out fill-mode-both">
                     <div className="flex justify-between items-end px-1">
                         <div className="flex items-center gap-2">
                             <div className="w-1.5 h-4 bg-gradient-to-b from-emerald-400 to-teal-600 rounded-full"></div>
@@ -189,7 +191,6 @@ export default function HalamanPrayer() {
                         </span>
                     </div>
 
-                    {/* Menggunakan rounded-3xl */}
                     <div className="rounded-3xl bg-white dark:bg-zinc-900 p-2 shadow-sm border border-gray-100 dark:border-zinc-800">
                         <PrayerCard jadwal={jadwal.timings} sholatBerikutnya={sholatBerikutnya?.nama} />
                     </div>
